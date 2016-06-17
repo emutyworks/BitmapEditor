@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--
+Arduboy Web-based bitmap editor
+
+Copyright (c) 2016 emutyworks
+
+Released under the MIT license
+http://opensource.org/licenses/mit-license.php
+-->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+<title>BitmapEditor (prototype)</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-language" content="ja" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<link rel="stylesheet" type="text/css" href="css/main.css">
+<script type="text/javascript" src="js/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
+</head>
+<body>
+<b>Pixel:</b>
+<a href="javascript:change_edit_pixel(8,8);">8x8</a> | 
+<a href="javascript:change_edit_pixel(16,16);">16x16</a> | 
+<a href="javascript:change_edit_pixel(32,32);">32x32</a> | 
+<a href="javascript:change_edit_pixel(64,64);">64x64</a> | 
+<a href="javascript:change_edit_pixel(128,64);">128x64</a>
+<b>Data:</b>
+<a id="download" href="" download="" onclick="data_download()"　target="_blank">Download</a> | 
+Upload <input type="file" id="data_upload" accept="text/*"><br>
+<b>Memo:</b> <input type="text" name="memo" id="memo"><br>
+<span id="edit_menu">
+<span id="edit_info"></span>&nbsp;
+<b>Edit:</b>
+<a href="javascript:edit_cut();">Cut</a> | 
+<a href="javascript:edit_copy();">Copy</a> | 
+<a href="javascript:edit_paste();">Paste</a> | 
+<input type="checkbox" name="edit_alert" id="edit_alert" onclick="set_edit_alert()" value="">Do not display confirmation
+<br>
+<b>Rotation</b>
+<a href="javascript:edit_half_turn();">Half turn</a> | 
+<a href="javascript:edit_clockwize();">Clockwize</a> | 
+<a href="javascript:edit_counter_clockwize();">Counter Clockwize</a> | 
+<a href="javascript:edit_horisonal();">Horisonal</a> | 
+<a href="javascript:edit_vertical();">Vertical</a><br>
+</span>
+
+<canvas id="editer" width="" height=""></canvas><br>
+
+<textarea id="hx" rows="30" cols="110"></textarea><br>
+
+</body>
+</html>

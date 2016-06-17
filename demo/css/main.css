@@ -1,0 +1,11 @@
+body {
+  font-size: 9pt;
+  padding: 0px 0px 0px 0px;
+  }
+#editer {
+  position: relative;
+  top: -30px;
+  }
+#edit_menu {
+  z-index: 1;
+  }
