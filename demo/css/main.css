@@ -2,10 +2,24 @@ body {
   font-size: 9pt;
   padding: 0px 0px 0px 0px;
   }
-#editer {
-  position: relative;
-  top: -30px;
-  }
+#edit_view {
+	position: relative;
+	left: 0px;
+	top: 5px;
+	}
 #edit_menu {
-  z-index: 1;
+	position: absolute;
+  z-index: 2;
+  }
+#editor {
+	position: absolute;
+	z-index: 1;
+	left: 0px;
+	top: 0px;
+  }
+#cursor {
+	position: absolute;
+	z-index: 0;
+	left: 0px;
+	top: 0px;
   }

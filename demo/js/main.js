@@ -7,10 +7,13 @@
  http://opensource.org/licenses/mit-license.php
 */
 window.onload = function(){
-  editer = document.getElementById('editer');
-  ctx = editer.getContext('2d');
+  editor = document.getElementById('editor');
+  ctx = editor.getContext('2d');
 
-  init_editer();
+  cursor = document.getElementById('cursor');
+  //c_ctx = cursor.getContext('2d');
+
+  init_editor();
   init_clip();
 
   $('#memo').attr({
@@ -39,6 +42,7 @@ window.onload = function(){
       }else{
         change_bw();
       }
+    }else{
     }
   }
 
@@ -47,15 +51,17 @@ window.onload = function(){
     view_edit_info();
   }
 
-  editer.addEventListener('click', onMouseClick, false);
-  editer.addEventListener('mousemove', onMouseMove, false);
+  editor.addEventListener('click', onMouseClick, false);
+  editor.addEventListener('mousemove', onMouseMove, false);
+  //cursor.addEventListener('click', onMouseClick, false);
+  //cursor.addEventListener('mousemove', onMouseMove, false);
 
   function mousePos(e){
     var rect = e.target.getBoundingClientRect();
     var org_x = e.clientX - rect.left;
     var org_y = e.clientY - rect.top;
     var x = org_x;
-    var y = org_y - EDITER_MAIN_Y;
+    var y = org_y - EDITOR_MAIN_Y;
 
     var dx = parseInt(x / PIXEL_SIZE);
     var dy = parseInt(y / PIXEL_SIZE);
@@ -82,9 +88,9 @@ window.onload = function(){
     　 var up_array = up_text.split("\n");
 
       var up_d = new Array();
-      var editer_data = '';
+      var editor_data = '';
       var clipboard_data = '';
-      var editer_data_ended = null;
+      var editor_data_ended = null;
       var clipboard_data_ended = null;
       for(var i=0; i < up_array.length; i++){
         var row = up_array[i];
@@ -95,14 +101,14 @@ window.onload = function(){
             var comment = row.split("]");
             var key = comment[0].substr(comment[0].indexOf('[')+1).trim();
             up_d[key] = comment[1].trim();
-          }else if(row.trim() == '# editer_data_ended'){
-            editer_data_ended = 1;
+          }else if(row.trim() == '# editor_data_ended' || row.trim() == '# editer_data_ended'){
+            editor_data_ended = 1;
           }else if(row.trim() == '# clipboard_data_ended'){
             clipboard_data_ended = 1;
           }
         }else if(row.charAt(0) == '0'){
-          if(!editer_data_ended){
-            editer_data += row.replace(/\s+/g, "");
+          if(!editor_data_ended){
+            editor_data += row.replace(/\s+/g, "");
           }else if(!clipboard_data_ended){
             clipboard_data += row.replace(/\s+/g, "");
           }
@@ -114,7 +120,7 @@ window.onload = function(){
       
       $('#memo').attr('value', up_d['Memo']);
     
-      d = editer_data.split(',');
+      d = editor_data.split(',');
       clipboard = clipboard_data.split(',');
       set_data();
       set_clip_data();
@@ -144,7 +150,7 @@ function data_download(){
   content += "# [Pixel] " + MAX_PIXEL_X + "x" + MAX_PIXEL_Y + "\n";
   content += "# [Memo] " + $("#memo").val() + "\n";
   content += get_hx_str();
-  content += "# editer_data_ended \n";
+  content += "# editor_data_ended \n";
   content += "# clipboard data \n";
   content += get_clip_hx_str();
   content += "# clipboard_data_ended \n";

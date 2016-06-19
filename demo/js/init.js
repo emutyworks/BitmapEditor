@@ -12,18 +12,18 @@ var PIXEL_SIZE = 16;
 var PRE_PIXEL_SIZE = 2;
 var CLIP_PIXEL_SIZE = 4;
 
-var EDITER_LINE = "#808080";
-var EDITER_GUIDE = "#e0e080";
-var EDITER_CUR = "#ff0000";
-var EDITER_W = "#ffffff";
-var EDITER_B = "#000000";
-var EDITER_MENU_SIZE = 45;
-var EDITER_MENU_Y = PRE_PIXEL_SIZE * MAX_PIXEL_Y;
-var EDITER_MAIN_Y = EDITER_MENU_Y + EDITER_MENU_SIZE;
-var EDITER_PRE_X = 1;
-var EDITER_PRE_Y = 1;
-var EDITER_MAX_X = (8 * 128) + 1 + 270;
-var EDITER_MAX_Y = (PRE_PIXEL_SIZE * 64) + EDITER_MENU_SIZE + (8 * 64);
+var EDITOR_LINE = "#808080";
+var EDITOR_GUIDE = "#e0e080";
+var EDITOR_CUR = "#ff0000";
+var EDITOR_W = "#ffffff";
+var EDITOR_B = "#000000";
+var EDITOR_MENU_SIZE = 45;
+var EDITOR_MENU_Y = PRE_PIXEL_SIZE * MAX_PIXEL_Y;
+var EDITOR_MAIN_Y = EDITOR_MENU_Y + EDITOR_MENU_SIZE;
+var EDITOR_PRE_X = 0;
+var EDITOR_PRE_Y = 0;
+var EDITOR_MAX_X = (8 * 128) + 1 + 270;
+var EDITOR_MAX_Y = (PRE_PIXEL_SIZE * 64) + EDITOR_MENU_SIZE + (8 * 64);
 
 var CLIP_MAX_X = 8;
 var CLIP_MAX_Y = 16;
@@ -39,8 +39,10 @@ var clipboard = new Array();
 var set_w = null;
 var set_b = null;
 var get_dy = null;
-var editer = null;
+var editor = null;
 var ctx = null;
+var cursor = null;
+var c_ctx = null;
 var cur_info = new Array();
 var edit_alert = true;
 
@@ -62,9 +64,9 @@ function init_clip(){
   var max_y = (CLIP_PIXEL_SIZE * 8 + 1) * CLIP_MAX_Y + 1;
 
   CLIP_X = PIXEL_SIZE * MAX_PIXEL_X + 10;
-  CLIP_Y = EDITER_MAIN_Y;
+  CLIP_Y = EDITOR_MAIN_Y;
 
-  ctx.fillStyle = EDITER_B;
+  ctx.fillStyle = EDITOR_B;
   ctx.fillRect(CLIP_X, CLIP_Y, max_x, max_y);
 
   init_clip_guide();
@@ -74,7 +76,7 @@ function init_clip_guide(){
   var max_x = (CLIP_PIXEL_SIZE * 8 + 1) * CLIP_MAX_X + 1;
   var max_y = (CLIP_PIXEL_SIZE * 8 + 1) * CLIP_MAX_Y + 1;
 
-  ctx.fillStyle = EDITER_LINE;
+  ctx.fillStyle = EDITOR_LINE;
 
   for(var i = 1; i < CLIP_MAX_X + 1; i++){
     ctx.fillRect(CLIP_X + (i * CLIP_PIXEL_SIZE * 8) + i, CLIP_Y, 1, max_y);
@@ -99,7 +101,7 @@ function init_clip_data(){
 }
 
 /*
- * editer
+ * editor
  */
 function init_area_d(){
   area_d = {
@@ -108,9 +110,11 @@ function init_area_d(){
   };
 }
 
-function init_editer(){
+function init_editor(){
   var max_x = PIXEL_SIZE * MAX_PIXEL_X;
   var max_y = PIXEL_SIZE * MAX_PIXEL_Y;
+  var pre_max_x = PRE_PIXEL_SIZE * MAX_PIXEL_X;
+  var pre_max_y = PRE_PIXEL_SIZE * MAX_PIXEL_Y;
 
   view_edit_info();
 
@@ -119,47 +123,57 @@ function init_editer(){
     var dy = area_d['y'] * 8;
 
     /* preview */
-    ctx.fillStyle = EDITER_B;
-    ctx.fillRect(dx * PRE_PIXEL_SIZE, dy * PRE_PIXEL_SIZE, PRE_PIXEL_SIZE * 8, PRE_PIXEL_SIZE * 8);
+    ctx.fillStyle = EDITOR_B;
+    ctx.fillRect(dx * PRE_PIXEL_SIZE + 1, dy * PRE_PIXEL_SIZE + 1, PRE_PIXEL_SIZE * 8, PRE_PIXEL_SIZE * 8);
 
-    ctx.strokeStyle = EDITER_LINE;
-    ctx.strokeRect(EDITER_PRE_X, EDITER_PRE_Y, PRE_PIXEL_SIZE * MAX_PIXEL_X, PRE_PIXEL_SIZE * MAX_PIXEL_Y);
+    ctx.fillStyle = EDITOR_LINE;
+    ctx.fillRect(EDITOR_PRE_X, EDITOR_PRE_Y, pre_max_x + 2, 1);
+    ctx.fillRect(EDITOR_PRE_X, EDITOR_PRE_Y, 1, pre_max_y + 2);
+    ctx.fillRect(pre_max_x + 1, EDITOR_PRE_Y, 1, pre_max_y + 2);
+    ctx.fillRect(EDITOR_PRE_X, pre_max_y + 1, pre_max_x + 2, 1);
 
-    /* editer main */
-    ctx.fillStyle = EDITER_B;
-    ctx.fillRect(dx * PIXEL_SIZE, EDITER_MAIN_Y + dy * PIXEL_SIZE, PIXEL_SIZE * 8, PIXEL_SIZE * 8);
+    /* editor main */
+    ctx.fillStyle = EDITOR_B;
+    ctx.fillRect(dx * PIXEL_SIZE, dy * PIXEL_SIZE + EDITOR_MAIN_Y, PIXEL_SIZE * 8, PIXEL_SIZE * 8);
 
   }else{
-    $('#editer').attr({
-      width: EDITER_MAX_X,
-      height: EDITER_MAX_Y,
+    $('#editor').attr({
+      width: EDITOR_MAX_X,
+      height: EDITOR_MAX_Y,
+    });
+
+    $('#cursor').attr({
+      width: EDITOR_MAX_X,
+      height: EDITOR_MAX_Y,
     });
 
     /* preview */
-    ctx.fillStyle = EDITER_B;
-    ctx.fillRect(EDITER_PRE_X, EDITER_PRE_Y, PRE_PIXEL_SIZE * MAX_PIXEL_X, PRE_PIXEL_SIZE * MAX_PIXEL_Y);
+    ctx.fillStyle = EDITOR_B;
+    ctx.fillRect(EDITOR_PRE_X, EDITOR_PRE_Y, pre_max_x + 2, pre_max_y + 2);
 
-    ctx.strokeStyle = EDITER_LINE;
-    ctx.strokeRect(EDITER_PRE_X, EDITER_PRE_Y, PRE_PIXEL_SIZE * MAX_PIXEL_X, PRE_PIXEL_SIZE * MAX_PIXEL_Y);
+    ctx.fillStyle = EDITOR_LINE;
+    ctx.fillRect(EDITOR_PRE_X, EDITOR_PRE_Y, pre_max_x + 2, 1);
+    ctx.fillRect(EDITOR_PRE_X, EDITOR_PRE_Y, 1, pre_max_y + 2);
+    ctx.fillRect(pre_max_x + 1, EDITOR_PRE_Y, 1, pre_max_y + 2);
+    ctx.fillRect(EDITOR_PRE_X, pre_max_y + 1, pre_max_x + 2, 1);
 
-    /* editer main */
-    ctx.fillStyle = EDITER_B;
-    ctx.fillRect(0, EDITER_MAIN_Y, max_x, max_y);
+    /* editor main */
+    ctx.fillStyle = EDITOR_B;
+    ctx.fillRect(0, EDITOR_MAIN_Y, max_x, max_y);
   }
   
-  init_editer_guide();
+  init_editor_guide();
 
   $('#edit_menu').css({
-    position: 'relative',
-    top: EDITER_MAIN_Y - 30,
+    top: EDITOR_MAIN_Y - 40,
   });
 
   /* outer frame */
-  //ctx.strokeStyle = EDITER_B;
-  //ctx.strokeRect(0,0,EDITER_MAX_X,EDITER_MAX_Y);
+  //ctx.strokeStyle = EDITOR_B;
+  //ctx.strokeRect(0,0,EDITOR_MAX_X,EDITOR_MAX_Y);
 }
 
-function init_editer_guide(){
+function init_editor_guide(){
   var max_x = PIXEL_SIZE * MAX_PIXEL_X;
   var max_y = PIXEL_SIZE * MAX_PIXEL_Y;
 
@@ -167,50 +181,42 @@ function init_editer_guide(){
     var dx = area_d['x'] * 8;
     var dy = area_d['y'] * 8;
 
+    ctx.fillStyle = EDITOR_LINE;    
     for(var i = dx; i < dx + 9; i++){
-      if((i % 8)==0){
-        ctx.fillStyle = EDITER_GUIDE;
-      }else{
-        ctx.fillStyle = EDITER_LINE;    
-      }
-      ctx.fillRect(i * PIXEL_SIZE, EDITER_MAIN_Y + (dy * PIXEL_SIZE), 1, PIXEL_SIZE * 8);
+      ctx.fillRect(i * PIXEL_SIZE, EDITOR_MAIN_Y + (dy * PIXEL_SIZE), 1, PIXEL_SIZE * 8);
+    }
+    for(var i = dy; i < dy + 9; i++){
+      ctx.fillRect(PIXEL_SIZE * dx, EDITOR_MAIN_Y + (i * PIXEL_SIZE), PIXEL_SIZE * 8, 1);
     }
 
-    for(var i = dy; i < dy + 9; i++){
-      if((i % 8)==0){
-        ctx.fillStyle = EDITER_GUIDE;
-      }else{
-        ctx.fillStyle = EDITER_LINE;      
-      }
-      ctx.fillRect(PIXEL_SIZE * dx, EDITER_MAIN_Y + (i * PIXEL_SIZE), PIXEL_SIZE * 8, 1);
+    ctx.fillStyle = EDITOR_GUIDE;
+    for(var i = dx; i < dx + 9; i += 8){
+      ctx.fillRect(i * PIXEL_SIZE, EDITOR_MAIN_Y + (dy * PIXEL_SIZE), 1, PIXEL_SIZE * 8);
+    }
+    for(var i = dy; i < dy + 9; i += 8){
+      ctx.fillRect(PIXEL_SIZE * dx, EDITOR_MAIN_Y + (i * PIXEL_SIZE), PIXEL_SIZE * 8 + 1, 1);
     }
 
   }else{
-
+    ctx.fillStyle = EDITOR_LINE;
     for(var i = 0; i < MAX_PIXEL_X; i++){
-      if((i % 8)==0){
-        ctx.fillStyle = EDITER_GUIDE;
-      }else{
-        ctx.fillStyle = EDITER_LINE;
-    
-      }
-      ctx.fillRect(PIXEL_SIZE * i, EDITER_MAIN_Y, 1, max_y);
+      ctx.fillRect(PIXEL_SIZE * i, EDITOR_MAIN_Y, 1, max_y);
+    }
+    for(var i = 0; i < MAX_PIXEL_Y; i++){
+      ctx.fillRect(0, PIXEL_SIZE * i + EDITOR_MAIN_Y, max_x, 1);
     }
 
-    for(var i = 0; i < MAX_PIXEL_Y; i++){
-      if((i % 8)==0){
-        ctx.fillStyle = EDITER_GUIDE;
-      }else{
-        ctx.fillStyle = EDITER_LINE;      
-      }
-      ctx.fillRect(0, PIXEL_SIZE * i + EDITER_MAIN_Y, max_x, 1);
+    ctx.fillStyle = EDITOR_GUIDE;
+    for(var i = 0; i < MAX_PIXEL_X; i += 8){
+      ctx.fillRect(PIXEL_SIZE * i, EDITOR_MAIN_Y, 1, max_y);
     }
+    for(var i = 0; i < MAX_PIXEL_Y; i += 8){
+      ctx.fillRect(0, PIXEL_SIZE * i + EDITOR_MAIN_Y, max_x, 1);
+    }
+    ctx.fillRect(PIXEL_SIZE * MAX_PIXEL_Y, EDITOR_MAIN_Y, 1, max_y);
+    ctx.fillRect(0, PIXEL_SIZE * MAX_PIXEL_Y + EDITOR_MAIN_Y, max_x + 1, 1);
 
   }
-
-  ctx.fillStyle = EDITER_GUIDE;
-  ctx.fillRect(0, EDITER_MAIN_Y + max_y, max_x, 1);
-  ctx.fillRect(max_x, EDITER_MAIN_Y, 1, max_y);
 }
 
 function init_edit_data(){
