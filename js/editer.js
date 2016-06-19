@@ -6,6 +6,29 @@
  Released under the MIT license"
  http://opensource.org/licenses/mit-license.php
 */
+
+/*
+function set_edit_cur(dx,dy){
+  var cux = parseInt(dx / 8) * PIXEL_SIZE * 8;
+  var cuy = parseInt(dy / 8) * PIXEL_SIZE * 8;
+
+  c_ctx.globalAlpha = 0.5;
+  c_ctx.fillStyle = EDITOR_CUR;
+  c_ctx.fillRect(cux, cuy + EDITOR_MAIN_Y,  PIXEL_SIZE * 8 + 1, PIXEL_SIZE * 8 + 1);
+  c_ctx.globalAlpha = 1.0;
+
+  console.log('set_edit_cur');
+}
+
+function del_edit_cur(dx,dy){
+  var cux = parseInt(dx / 8) * PIXEL_SIZE * 8;
+  var cuy = parseInt(dy / 8) * PIXEL_SIZE * 8;
+
+  c_ctx.clearRect(cux, cuy + EDITOR_MAIN_Y,  PIXEL_SIZE * 8 + 1, PIXEL_SIZE * 8 + 1);
+  console.log('del_edit_cur');
+}
+*/
+
 function select_area_d(){
   var dx = cur_info['dx'];
   var dy = cur_info['dy'];
@@ -13,15 +36,18 @@ function select_area_d(){
   var y = parseInt(dy / 8);
 
   if(!is_area_d()){
+    var cux = parseInt(dx / 8) * PIXEL_SIZE * 8;
+    var cuy = parseInt(dy / 8) * PIXEL_SIZE * 8;
     area_d['x'] = parseInt(dx / 8);
     area_d['y'] = parseInt(dy / 8);
 
     ctx.globalAlpha = 0.5;
-    ctx.fillStyle = EDITER_CUR;
-    ctx.fillRect(x * PIXEL_SIZE * 8, (y * PIXEL_SIZE * 8) + EDITER_MAIN_Y,  PIXEL_SIZE * 8 + 1, PIXEL_SIZE * 8 + 1);
+    ctx.fillStyle = EDITOR_CUR;
+    ctx.fillRect(cux, cuy + EDITOR_MAIN_Y,  PIXEL_SIZE * 8 + 1, PIXEL_SIZE * 8 + 1);
     ctx.globalAlpha = 1.0;
+
   }else if(area_d['x'] == x && area_d['y'] == y){
-    redraw_editer();
+    redraw_editor();
   }
 }
 
@@ -62,7 +88,7 @@ function edit_counter_clockwize(){
     }
   }
 
-  redraw_editer();
+  redraw_editor();
 }
 
 function edit_clockwize(){
@@ -92,7 +118,7 @@ function edit_clockwize(){
     }
   }
 
-  redraw_editer();
+  redraw_editor();
 }
 
 function edit_half_turn(){
@@ -110,7 +136,7 @@ function edit_half_turn(){
     }
   }
 
-  redraw_editer();
+  redraw_editor();
 }
 
 function edit_vertical(){
@@ -127,7 +153,7 @@ function edit_vertical(){
     }
   }
 
-  redraw_editer();
+  redraw_editor();
 }
 
 function edit_horisonal(){
@@ -143,7 +169,7 @@ function edit_horisonal(){
     }
   }
 
-  redraw_editer();
+  redraw_editor();
 }
 
 function horisonal_area(clip){
@@ -186,7 +212,7 @@ function edit_paste(){
     }
   }
  
-  redraw_editer();
+  redraw_editor();
 }
 
 function edit_copy(){
@@ -205,7 +231,7 @@ function edit_copy(){
     edit_clip = clipboard.slice(pos, pos + 8);
   }
 
-  redraw_editer();
+  redraw_editor();
 }
 
 function edit_cut(){
@@ -221,7 +247,7 @@ function edit_cut(){
     }
   }
 
-  redraw_editer();
+  redraw_editor();
 }
 
 function edit_confirm(mes){
@@ -260,8 +286,8 @@ function get_area_d_pos(){
   return x * 8 + MAX_PIXEL_X * y;
 }
 
-function redraw_editer(){
-  init_editer();
+function redraw_editor(){
+  init_editor();
   set_data();
   init_area_d();
 
@@ -293,7 +319,7 @@ function change_edit_pixel(x,y){
     MAX_PIXEL_X = x;
     MAX_PIXEL_Y = y;
 
-    EDITER_MAX_Y = (PRE_PIXEL_SIZE * 64) + EDITER_MENU_SIZE + (8 * 64) + 1;
+    EDITOR_MAX_Y = (PRE_PIXEL_SIZE * 64) + EDITOR_MENU_SIZE + (8 * 64) + 1;
 
     if(MAX_PIXEL_X==128){
       PIXEL_SIZE = 8;
@@ -305,13 +331,13 @@ function change_edit_pixel(x,y){
       PIXEL_SIZE = 14;
     }else if(MAX_PIXEL_Y==64){
       PIXEL_SIZE = 10;
-      EDITER_MAX_Y = (PRE_PIXEL_SIZE * MAX_PIXEL_Y) + EDITER_MENU_SIZE + (PIXEL_SIZE * MAX_PIXEL_Y) + 1;
+      EDITOR_MAX_Y = (PRE_PIXEL_SIZE * MAX_PIXEL_Y) + EDITOR_MENU_SIZE + (PIXEL_SIZE * MAX_PIXEL_Y) + 1;
     }
-    EDITER_MENU_Y = PRE_PIXEL_SIZE * MAX_PIXEL_Y;
-    EDITER_MAIN_Y = EDITER_MENU_Y + EDITER_MENU_SIZE;
+    EDITOR_MENU_Y = PRE_PIXEL_SIZE * MAX_PIXEL_Y;
+    EDITOR_MAIN_Y = EDITOR_MENU_Y + EDITOR_MENU_SIZE;
 
     init_edit_data();
-    init_editer();
+    init_editor();
 
     redraw_clip();
   }
@@ -337,18 +363,17 @@ function set_bw(dx,dy,bw){
 
   if(bw==1){
     d[x] = '0x' + ('00' + parseInt((d[x] | set_w[y]),10).toString(16)).slice(-2);
-    ctx.fillStyle = EDITER_W;
+    ctx.fillStyle = EDITOR_W;
 
   }else{
     d[x] = '0x' + ('00' + parseInt((d[x] & set_b[y]),10).toString(16)).slice(-2);
-    ctx.fillStyle = EDITER_B;
+    ctx.fillStyle = EDITOR_B;
   
   }
-  ctx.fillRect(dx * PIXEL_SIZE + 1, (dy * PIXEL_SIZE + 1) + EDITER_MAIN_Y, PIXEL_SIZE - 1, PIXEL_SIZE - 1);
-  ctx.fillRect(dx * PRE_PIXEL_SIZE + EDITER_PRE_X , dy * PRE_PIXEL_SIZE + EDITER_PRE_Y, PRE_PIXEL_SIZE, PRE_PIXEL_SIZE);
-
+  ctx.fillRect(dx * PIXEL_SIZE + 1, (dy * PIXEL_SIZE + 1) + EDITOR_MAIN_Y, PIXEL_SIZE - 1, PIXEL_SIZE - 1);
+  ctx.fillRect((dx * PRE_PIXEL_SIZE) + EDITOR_PRE_X + 1, (dy * PRE_PIXEL_SIZE) + EDITOR_PRE_Y + 1, PRE_PIXEL_SIZE, PRE_PIXEL_SIZE);
+ 
   var hx_str = get_hx_str();
-  //dev_log();
 
   $('#hx').val(hx_str);
 }

@@ -32,6 +32,8 @@ http://opensource.org/licenses/mit-license.php
 <a id="download" href="" download="" onclick="data_download()"　target="_blank">Download</a> | 
 Upload <input type="file" id="data_upload" accept="text/*"><br>
 <b>Memo:</b> <input type="text" name="memo" id="memo"><br>
+
+<div id="edit_view">
 <span id="edit_menu">
 <span id="edit_info"></span>&nbsp;
 <b>Edit:</b>
@@ -48,9 +50,9 @@ Upload <input type="file" id="data_upload" accept="text/*"><br>
 <a href="javascript:edit_vertical();">Vertical</a><br>
 </span>
 
-<canvas id="editer" width="" height=""></canvas><br>
-
-<textarea id="hx" rows="30" cols="110"></textarea><br>
+<canvas id="editor" width="" height=""></canvas>
+<canvas id="cursor" width="" height=""></canvas>
+</div>
 
 </body>
 </html>
