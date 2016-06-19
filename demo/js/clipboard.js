@@ -8,13 +8,17 @@
 */
 function get_clip_hx_str(){
   var hx_str = '';
-  for(var i = 0; i < (CLIP_MAX_X * 8 * CLIP_MAX_Y) / 16; i++){
-    var cx = i * 16;
-    hx_str += 
-      clipboard[cx]+', '+clipboard[cx+1]+', '+clipboard[cx+2]+', '+clipboard[cx+3]+', '+
-      clipboard[cx+4]+', '+clipboard[cx+5]+', '+clipboard[cx+6]+', '+clipboard[cx+7]+', '+
-      clipboard[cx+8]+', '+clipboard[cx+9]+', '+clipboard[cx+10]+', '+clipboard[cx+11]+', '+
-      clipboard[cx+12]+', '+clipboard[cx+13]+', '+clipboard[cx+14]+', '+clipboard[cx+15]+",\n";
+  for(var y = 0; y < CLIP_MAX_Y; y++){
+    var hx = ''; 
+    var str = "# " + (y * CLIP_MAX_X) + " - " + (y * CLIP_MAX_X + 7) + " blocks \n";
+
+    for(var x = 0; x < CLIP_MAX_X; x++){
+      var pos = (y * CLIP_MAX_X * 8) + (x * 8);
+      hx += 
+        clipboard[pos]+', '+clipboard[pos+1]+', '+clipboard[pos+2]+', '+clipboard[pos+3]+', '+
+        clipboard[pos+4]+', '+clipboard[pos+5]+', '+clipboard[pos+6]+', '+clipboard[pos+7]+",\n";
+    }
+    hx_str += str + hx;
   }
   return hx_str;
 }

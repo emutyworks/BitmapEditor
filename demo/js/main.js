@@ -151,7 +151,7 @@ function data_download(){
   content += "# [Memo] " + $("#memo").val() + "\n";
   content += get_hx_str();
   content += "# editor_data_ended \n";
-  content += "# clipboard data \n";
+  content += "# clipboard data (one block = 8x8 pixel = 0x00 x 8)  \n";
   content += get_clip_hx_str();
   content += "# clipboard_data_ended \n";
 
