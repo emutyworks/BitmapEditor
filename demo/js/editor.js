@@ -6,270 +6,284 @@
  Released under the MIT license"
  http://opensource.org/licenses/mit-license.php
 */
-
-/*
-function set_edit_cur(dx,dy){
-  var cux = parseInt(dx / 8) * PIXEL_SIZE * 8;
-  var cuy = parseInt(dy / 8) * PIXEL_SIZE * 8;
-
-  c_ctx.globalAlpha = 0.5;
-  c_ctx.fillStyle = EDITOR_CUR;
-  c_ctx.fillRect(cux, cuy + EDITOR_MAIN_Y,  PIXEL_SIZE * 8 + 1, PIXEL_SIZE * 8 + 1);
-  c_ctx.globalAlpha = 1.0;
-
-  console.log('set_edit_cur');
-}
-
-function del_edit_cur(dx,dy){
-  var cux = parseInt(dx / 8) * PIXEL_SIZE * 8;
-  var cuy = parseInt(dy / 8) * PIXEL_SIZE * 8;
-
-  c_ctx.clearRect(cux, cuy + EDITOR_MAIN_Y,  PIXEL_SIZE * 8 + 1, PIXEL_SIZE * 8 + 1);
-  console.log('del_edit_cur');
-}
-*/
-
-function select_area_d(){
-  var dx = cur_info['dx'];
-  var dy = cur_info['dy'];
-  var x = parseInt(dx / 8);
-  var y = parseInt(dy / 8);
-
-  if(!is_area_d()){
-    var cux = parseInt(dx / 8) * PIXEL_SIZE * 8;
-    var cuy = parseInt(dy / 8) * PIXEL_SIZE * 8;
-    area_d['x'] = parseInt(dx / 8);
-    area_d['y'] = parseInt(dy / 8);
-
-    ctx.globalAlpha = 0.5;
-    ctx.fillStyle = EDITOR_CUR;
-    ctx.fillRect(cux, cuy + EDITOR_MAIN_Y,  PIXEL_SIZE * 8 + 1, PIXEL_SIZE * 8 + 1);
-    ctx.globalAlpha = 1.0;
-
-  }else if(area_d['x'] == x && area_d['y'] == y){
-    redraw_editor();
-  }
-}
-
-function is_area_d(){
-  if(area_d['x'] != null && area_d['y'] != null){
-    return true;
-  }else{
+function edit_counter_clockwize(){
+  if(!cur_info['rect']){
+    set_edit_mes('no_rect');
     return false;
   }
-}
 
-function edit_counter_clockwize(){
-  var mes = 'counter clockwize';
-  var flag = edit_confirm(mes);
-  var pos = get_area_d_pos();
-  var clip = d.slice(pos, pos + 8);
+  var flag = true;
+  if(edit_alert){
+    flag = edit_confirm_alert('counter clockwize');
+  }
 
-  if(flag){
-    var b = new Array();
+  if(flag){    
+    var view_x = cur_info['view_x'];
+    var view_y = cur_info['view_y'];
+    var view_w = cur_info['view_w'];
+    var view_h = cur_info['view_h'];
 
-    for(var i = 0; i < 8; i++){
-      b[i] = cnv16to2(clip[i]);
-    }
+    set_edit_clip();
 
-    var cnt = 0;
-    for(var i = 7; i >= 0; i--){
-
-      var cb = '';
-      for(var j = 0; j < 8; j++){
-        cb += b[j].charAt(i);
+    for(var y = 0; y < view_h; y++){
+      var dy = view_y - 1;
+      for(var x = view_w; x >= 0; x--){
+        var bw = edit_clip[y][x];
+        set_bw(view_x + y,dy, bw);
+        dy++;
       }
-      clip[cnt] = cnv2to16(cb);
-      cnt++;
-    }
-
-    for(var i = 0; i < 8; i++){
-      d[i + pos] = clip[i];
     }
   }
 
+  del_cur();
+  cur_info['rect'] = false;
   redraw_editor();
 }
 
 function edit_clockwize(){
-  var mes = 'clockwize';
-  var flag = edit_confirm(mes);
-  var pos = get_area_d_pos();
-  var clip = d.slice(pos, pos + 8);
+  if(!cur_info['rect']){
+    set_edit_mes('no_rect');
+    return false;
+  }
 
-  if(flag){
-    var b = new Array();
+  var flag = true;
+  if(edit_alert){
+    flag = edit_confirm_alert('clockwize');
+  }
 
-    for(var i = 0; i < 8; i++){
-      b[i] = cnv16to2(clip[i]);
-    }
+  if(flag){    
+    var view_x = cur_info['view_x'];
+    var view_y = cur_info['view_y'];
+    var view_w = cur_info['view_w'];
+    var view_h = cur_info['view_h'];
 
-    var cnt = 0;
-    for(var i = 0; i < 8; i++){
-      var cb = '';
-      for(var j = 7; j >= 0; j--){
-        cb += b[j].charAt(i);
+    set_edit_clip();
+
+    var dx = view_x + view_h - 1
+    for(var y = 0; y < view_h; y++){
+      for(var x = 0; x < view_w; x++){
+        var bw = edit_clip[y][x];
+        set_bw(dx,view_y + x, bw);
       }
-      clip[cnt] = cnv2to16(cb);
-      cnt++;
-    }
-    for(var i = 0; i < 8; i++){
-      d[i + pos] = clip[i];
+      dx--;
     }
   }
 
+  del_cur();
+  cur_info['rect'] = false;
   redraw_editor();
 }
 
 function edit_half_turn(){
-  var mes = 'half turn';
-  var flag = edit_confirm(mes);
-  var pos = get_area_d_pos();
-  var clip = d.slice(pos, pos + 8);
+  if(!cur_info['rect']){
+    set_edit_mes('no_rect');
+    return false;
+  }
 
-  if(flag){
-    var j = 7;
-    clip = horisonal_area(clip);
-    for(var i = 0; i < 8; i++){
-      d[i + pos] = clip[j];
-      j--;
+  var flag = true;
+  if(edit_alert){
+    flag = edit_confirm_alert('half turn');
+  }
+
+  if(flag){    
+    var view_x = cur_info['view_x'];
+    var view_y = cur_info['view_y'];
+    var view_w = cur_info['view_w'];
+    var view_h = cur_info['view_h'];
+
+    set_edit_clip();
+
+    var y = 0;
+    for(var dy = view_h - 1; dy >= 0; dy--){
+      var dx = view_x + view_w - 1;
+      for(var x = 0; x < view_w; x++){
+        var bw = edit_clip[y][x];
+        set_bw(dx, view_y + dy, bw);
+        dx--;
+      }
+      y++;
     }
   }
 
-  redraw_editor();
-}
-
-function edit_vertical(){
-  var mes = 'vertical';
-  var flag = edit_confirm(mes);
-  var pos = get_area_d_pos();
-  var clip = d.slice(pos, pos + 8);
-
-  if(flag){
-    var j = 7;
-    for(var i = 0; i < 8; i++){
-      d[i + pos] = clip[j];
-      j--;
-    }
-  }
-
+  del_cur();
+  cur_info['rect'] = false;
   redraw_editor();
 }
 
 function edit_horisonal(){
-  var mes = 'horisonal';
-  var flag = edit_confirm(mes);
-  var pos = get_area_d_pos();
-  var clip = d.slice(pos, pos + 8);
-
-  if(flag){
-    clip = horisonal_area(clip);
-    for(var i = 0; i < 8; i++){
-      d[i + pos] = clip[i];
-    }
-  }
-
-  redraw_editor();
-}
-
-function horisonal_area(clip){
-  for(var i = 0; i < 8; i++){
-    var b = cnv16to2(clip[i]);
-    var hb = '';
-
-    for(var j = 7; j >= 0; j--){
-      hb += b.charAt(j);
-    }
-    clip[i] = cnv2to16(hb);
-  }
-  return clip;
-}
-
-function edit_paste(){
-  var mes = 'paste';
-
-  if(!is_area_d() && !is_clip_d()){
-    unselected_area_alert(mes);
+  if(!cur_info['rect']){
+    set_edit_mes('no_rect');
     return false;
   }
 
   var flag = true;
   if(edit_alert){
-    flag = edit_confirm_alert(mes);
+    flag = edit_confirm_alert('horisonal');
+  }
+
+  if(flag){    
+    var view_x = cur_info['view_x'];
+    var view_y = cur_info['view_y'];
+    var view_w = cur_info['view_w'];
+    var view_h = cur_info['view_h'];
+
+    set_edit_clip();
+
+    var dx = view_x + view_w - 1;
+    for(var x = 0; x < view_w; x++){
+      for(var y = 0; y < view_h; y++){
+        var bw = edit_clip[y][x];
+        set_bw(dx, view_y + y, bw);
+      }
+      dx--;
+    }
+  }
+
+  del_cur();
+  cur_info['rect'] = false;
+  redraw_editor();
+}
+
+function edit_vertical(){
+  if(!cur_info['rect']){
+    set_edit_mes('no_rect');
+    return false;
+  }
+
+  var flag = true;
+  if(edit_alert){
+    flag = edit_confirm_alert('vertical');
+  }
+
+  if(flag){    
+    var view_x = cur_info['view_x'];
+    var view_y = cur_info['view_y'];
+    var view_w = cur_info['view_w'];
+    var view_h = cur_info['view_h'];
+
+    set_edit_clip();
+
+    var dy = view_y + view_h - 1;  
+    for(var y = 0; y < view_h; y++){
+      for(var x = 0; x < view_w; x++){
+        var bw = edit_clip[y][x];
+        set_bw(view_x + x, dy, bw);
+      }
+      dy--;
+    }
+  }
+
+  del_cur();
+  cur_info['rect'] = false;
+  redraw_editor();
+}
+
+function edit_paste(){
+  if(!cur_info['rect'] && !is_clip_d()){
+    set_edit_mes('no_rect');
+    return false;
+  }
+
+  var flag = true;
+  if(edit_alert){
+    flag = edit_confirm_alert('paste');
   }
 
   if(flag){
-    if(is_area_d()){
-      var pos = get_area_d_pos();
-      for(var i = 0; i < 8; i++){
-        d[i + pos] = edit_clip[i];
-      }
-    }else if(is_clip_d()){
+    if(cur_info['rect']){
+      paste_edit_clip();
+    }else{
       var pos = get_clip_d_pos();
-      for(var i = 0; i < 8; i++){
-        clipboard[i + pos] = edit_clip[i];
+      var clip_x = cur_info['clip_x'];
+      var clip_y = cur_info['clip_y'];
+      var clip_w = cur_info['clip_w'];
+      var clip_h = cur_info['clip_h'];
+
+      if(clip_w > 8){ clip_w = 8; }
+      if(clip_h > 8){ clip_h = 8; }
+      for(var x = 0; x < clip_w; x++){
+        var row = '';
+        for(var y = 0; y < clip_h; y++){
+          var bw = edit_clip[y][x];
+          row = bw + row;
+        }
+        clipboard[pos + x] = cnv2to16(row);
       }
     }
   }
- 
+
+  del_cur();
+  cur_info['rect'] = false;
   redraw_editor();
 }
 
 function edit_copy(){
-  var mes = 'copy';
-
-  if(!is_area_d() && !is_clip_d()){
-    unselected_area_alert(mes);
+  if(!cur_info['rect'] && !is_clip_d()){
+    set_edit_mes('no_rect');
     return false;
   }
 
-  if(is_area_d()){
-    var pos = get_area_d_pos();
-    edit_clip = d.slice(pos, pos + 8);
-  }else if(is_clip_d()){
+  if(cur_info['rect']){
+    set_edit_clip();
+  }else{
     var pos = get_clip_d_pos();
-    edit_clip = clipboard.slice(pos, pos + 8);
+    cur_info['clip_x'] = 0;
+    cur_info['clip_y'] = 0;
+    cur_info['clip_w'] = 8;
+    cur_info['clip_h'] = 8;
+
+    edit_clip = new Array();
+
+    var p = 7;
+    for(var y = 0; y < 8; y++){
+      var row = new Array();
+      for(var x = 0; x < 8; x++){
+        row[x] = cnv16to2(clipboard[pos + x]).charAt(p);
+      }
+      edit_clip[y] = row;
+      p--;
+    }
   }
 
+  del_cur();
+  cur_info['rect'] = false;
   redraw_editor();
 }
 
 function edit_cut(){
-  var mes = 'cut';
-  var flag = edit_confirm(mes);
-
-  if(flag){
-    var pos = get_area_d_pos();
-
-    edit_clip = d.slice(pos, pos + 8);
-    for(var i = 0; i < 8; i++){
-      d[i + pos] = '0x00';
-    }
-  }
-
-  redraw_editor();
-}
-
-function edit_confirm(mes){
-  if(!is_area_d()){
-    unselected_area_alert(mes);
+  if(!cur_info['rect']){
+    set_edit_mes('no_rect');
     return false;
   }
 
   var flag = true;
   if(edit_alert){
-    flag = edit_confirm_alert(mes);
+    flag = edit_confirm_alert('cut');
+  }
+  if(flag){
+    var view_x = cur_info['view_x'];
+    var view_y = cur_info['view_y'];
+    var view_w = cur_info['view_w'];
+    var view_h = cur_info['view_h'];
+
+    set_edit_clip();
+
+    for(var y = 0; y < view_h; y++){
+      for(var x = 0; x < view_w; x++){
+        var dx = x + view_x;
+        var dy = y + view_y;
+        set_bw(dx, dy, 0);
+      }
+    }
   }
 
-  return flag;
+  del_cur();
+  cur_info['rect'] = false;
+  redraw_editor();
 }
 
 function edit_confirm_alert(mes){
   return window.confirm('Do you ' + mes + ' it?');
-}
-
-function unselected_area_alert(mes){
-  alert('Please select a ' + mes + ' area (SHIFT + Mouse click)');
 }
 
 function set_edit_alert(){
@@ -280,16 +294,9 @@ function set_edit_alert(){
   }
 }
 
-function get_area_d_pos(){
-  var x = area_d['x'];
-  var y = area_d['y'];
-  return x * 8 + MAX_PIXEL_X * y;
-}
-
 function redraw_editor(){
   init_editor();
   set_data();
-  init_area_d();
 
   redraw_clip();
 }
@@ -299,7 +306,7 @@ function check_edit_area(){
   var dx = cur_info['dx'];
   var dy = cur_info['dy'];
 
-  if(y >= 0 && dx < MAX_PIXEL_X && dy < MAX_PIXEL_Y){
+  if(y >= 0 && dx < MAX_PIXEL_X + 1 && dy < MAX_PIXEL_Y + 1){
     return true;
   }
   return false;
@@ -309,8 +316,15 @@ function view_edit_info(){
  if(check_edit_area()){
     var dx = ('000' + cur_info['dx']).slice(-3);
     var dy = ('000' + cur_info['dy']).slice(-3);
+    var view_x = ('000' + cur_info['view_x']).slice(-3);
+    var view_y = ('000' + cur_info['view_y']).slice(-3);
+    var view_w = ('000' + cur_info['view_w']).slice(-3);
+    var view_h = ('000' + cur_info['view_h']).slice(-3);
 
-    $('#edit_info').html('x:' + dx +' y:' + dy);
+    $('#edit_info').html(
+      '<span class="mono"> x:' + dx + " y:" + dy + "</span>" +
+      ' <b>Cursor:</b> <span class="mono">x:' + view_x + " y:" + view_y +" w:" + view_w + ' h:' + view_h + "</span>"
+    );
   }
 }
 
@@ -396,6 +410,21 @@ function get_hx_str(){
   return hx_str;
 }
 
+function set_editor_fillrect(x,y,w,h,color,alpha){
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  ctx.fillRect(x,y,w,h);
+  ctx.globalAlpha = 1.0;
+}
+
+function set_editor_rect(x,y,w,h,color){
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, w, 1);
+  ctx.fillRect(x, y, 1, h);
+  ctx.fillRect(x + w, y, 1, h);
+  ctx.fillRect(x, y + h, w + 1, 1);
+}
+
 /*
  * data
  */
@@ -406,12 +435,15 @@ function get_d(dx,dy){
 }
 
 function set_data(){
-  if(area_d['x']!=null || area_d['y']!=null){
-    var dx = area_d['x'] * 8;
-    var dy = area_d['y'] * 8;
-    for(var y = dy; y < dy + 8; y++){
-      for(var x = dx; x < dx + 8; x++){
-        set_bw(x,y,get_d(x,y));
+  var x = cur_info['view_x'];
+  var y = cur_info['view_y'];
+  var w = cur_info['view_w'];
+  var h = cur_info['view_h'];
+
+  if(w > 0 && h > 0){
+    for(var dy = y; dy < y + h; dy++){
+      for(var dx = x; dx < x + w; dx++){
+        set_bw(dx,dy,get_d(dx,dy));
       }
     }
   }else{

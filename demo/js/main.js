@@ -11,15 +11,14 @@ window.onload = function(){
   ctx = editor.getContext('2d');
 
   cursor = document.getElementById('cursor');
-  //c_ctx = cursor.getContext('2d');
+  c_ctx = cursor.getContext('2d');
 
   init_editor();
   init_clip();
 
-  $('#memo').attr({
-    value: 'New Character',
-    size: '50',
-  });
+  $('#memo').attr({ value: 'New Character' });
+  $('#min_w').attr({ value: cur_info['min_w'] });
+  $('#min_h').attr({ value: cur_info['min_h'] });
 
 /*
   $(window).on('beforeunload', function() {
@@ -27,7 +26,7 @@ window.onload = function(){
   });
 */
   /* canvas mouse event */
-  function onMouseClick(e){
+  function onMouseDown(e){
     mousePos(e);
 
     if(check_clip_area()){
@@ -38,7 +37,7 @@ window.onload = function(){
 
     if(check_edit_area()){
       if(event.shiftKey){
-        select_area_d();
+        start_cur();
       }else{
         change_bw();
       }
@@ -49,12 +48,23 @@ window.onload = function(){
   function onMouseMove(e){
     mousePos(e);
     view_edit_info();
-  }
 
-  editor.addEventListener('click', onMouseClick, false);
-  editor.addEventListener('mousemove', onMouseMove, false);
-  //cursor.addEventListener('click', onMouseClick, false);
-  //cursor.addEventListener('mousemove', onMouseMove, false);
+    if(check_edit_area()){
+      if(event.shiftKey){
+        if(cur_info['down']){
+          drag_cur();
+        }
+      }else{
+        if(cur_info['down']){
+          end_cur();
+        }
+      }
+    }else{
+      del_edit_mes();
+    }
+  }
+  cursor.addEventListener('mousedown', onMouseDown, false);
+  cursor.addEventListener('mousemove', onMouseMove, false);
 
   function mousePos(e){
     var rect = e.target.getBoundingClientRect();
@@ -63,17 +73,28 @@ window.onload = function(){
     var x = org_x;
     var y = org_y - EDITOR_MAIN_Y;
 
+    //editor
     var dx = parseInt(x / PIXEL_SIZE);
     var dy = parseInt(y / PIXEL_SIZE);
 
-    cur_info = {
-      org_x: org_x,
-      org_y: org_y,
-      x: x,
-      y: y,
-      dx: dx,
-      dy: dy,
-    }
+    //clipboard
+    var cx = parseInt((x - CLIP_X) / (CLIP_PIXEL_SIZE * 8 + 1));
+    var cy = parseInt(y / (CLIP_PIXEL_SIZE * 8 + 1));
+
+    cur_info['org_x'] = org_x;
+    cur_info['org_y'] = org_y;
+    cur_info['x'] = x;
+    cur_info['y'] = y;
+    cur_info['dx'] = dx;
+    cur_info['dy'] = dy;
+    cur_info['cx'] = cx;
+    cur_info['cy'] = cy;
+
+    if($('#min_w').val() == 0){ $('#min_w').attr({ value: 1 }); }
+    if($('#min_h').val() == 0){ $('#min_h').attr({ value: 1 }); }
+    cur_info['min_w'] = parseInt($('#min_w').val(),10);
+    cur_info['min_h'] = parseInt($('#min_h').val(),10);
+
   }
 
   /* data upload */
@@ -164,19 +185,17 @@ function data_download(){
   }
 }
 
+function set_edit_mes(key){
+  $('#edit_mes').html(edit_mes[key]);
+}
+
+function del_edit_mes(){
+  $('#edit_mes').html('');
+}
+
 function cnv16to2(hx){
   return ('00000000' + parseInt(hx,16).toString(2)).slice(-8);
 }
 function cnv2to16(b){
   return '0x' + ('00' + parseInt(b,2).toString(16)).slice(-2);
 }
-
-function dev_log(){
-/*
-  console.log('');
-  for(var i = 0; i < (MAX_PIXEL_X * MAX_PIXEL_Y / 8); i++){
-    console.log(i + ':' + ("00000000" + parseInt(d[i],16).toString(2)).slice(-8));
-  }
-*/
-}
-
