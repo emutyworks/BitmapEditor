@@ -302,12 +302,13 @@ function redraw_editor(){
 }
 
 function check_edit_area(){
+  var x = cur_info['x'];
   var y = cur_info['y'];
   var dx = cur_info['dx'];
   var dy = cur_info['dy'];
 
-  if(y >= 0 && dx < MAX_PIXEL_X + 1 && dy < MAX_PIXEL_Y + 1){
-    return true;
+  if(y >= 0 && x < CLIP_X && dx < MAX_PIXEL_X + 1 && dy < MAX_PIXEL_Y + 1){
+     return true;
   }
   return false;
 }
