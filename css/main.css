@@ -1,11 +1,26 @@
-body {
+body, input {
+  font-family: helvetica, arial, sans-serif;
   font-size: 9pt;
   padding: 0px 0px 0px 0px;
   }
+
+.mono {
+	font-family: monospace;
+	font-size: 10pt;
+}
+#memo {
+	width: 380px;
+	}
+#min_w, #min_h {
+	width: 30px;
+	}
 #edit_view {
 	position: relative;
 	left: 0px;
 	top: 5px;
+	}
+#edit_mes {
+	background-color:#ffff00;
 	}
 #edit_menu {
 	position: absolute;
@@ -13,13 +28,13 @@ body {
   }
 #editor {
 	position: absolute;
-	z-index: 1;
+	z-index: 0;
 	left: 0px;
 	top: 0px;
   }
 #cursor {
 	position: absolute;
-	z-index: 0;
+	z-index: 1;
 	left: 0px;
 	top: 0px;
   }

@@ -25,6 +25,7 @@ function get_clip_hx_str(){
 
 function set_clip_data(){
   var add_y = 1;
+  
   for(var y = 0; y < CLIP_MAX_Y; y++){
     var add_x = CLIP_X;
   
@@ -49,8 +50,6 @@ function set_clip_data(){
     }
     add_y++;
   }
-  //console.log(clip_d);
-  //console.log(clipboard);
 }
 
 function get_clip_d_pos(){
@@ -65,41 +64,20 @@ function redraw_clip(){
   init_clip_d();
 }
 
-/*
-function set_clip_cur(cx,cy){
-  var cux = CLIP_X + ((CLIP_PIXEL_SIZE * 8 + 1) * cx);
-  var cuy = CLIP_Y + ((CLIP_PIXEL_SIZE * 8 + 1) * cy);
-
-  c_ctx.globalAlpha = 0.5;
-  c_ctx.fillStyle = EDITOR_CUR;
-  c_ctx.fillRect(cux, cuy, CLIP_PIXEL_SIZE * 8 + 2, CLIP_PIXEL_SIZE * 8 + 2);
-  c_ctx.globalAlpha = 1.0;
-}
-
-function del_clip_cur(cx,cy){
-  var cux = CLIP_X + ((CLIP_PIXEL_SIZE * 8 + 1) * cx);
-  var cuy = CLIP_Y + ((CLIP_PIXEL_SIZE * 8 + 1) * cy);
-
-  c_ctx.clearRect(cux, cuy, CLIP_PIXEL_SIZE * 8 + 2, CLIP_PIXEL_SIZE * 8 + 2);
-}
-*/
-
 function select_clip_d(){
-  var x = cur_info['x'];
-  var y = cur_info['y'];
-  var cx = parseInt((x - CLIP_X) / (CLIP_PIXEL_SIZE * 8 + 1));
-  var cy = parseInt(y / (CLIP_PIXEL_SIZE * 8 + 1));
-  var cux = CLIP_X + ((CLIP_PIXEL_SIZE * 8 + 1) * cx);
-  var cuy = CLIP_Y + ((CLIP_PIXEL_SIZE * 8 + 1) * cy);
+  var cx = cur_info['cx'];
+  var cy = cur_info['cy'];
+  var x = CLIP_X + ((CLIP_PIXEL_SIZE * 8 + 1) * cx);
+  var y = CLIP_Y + ((CLIP_PIXEL_SIZE * 8 + 1) * cy);
+  var w = CLIP_PIXEL_SIZE * 8 + 1;
+  var h = CLIP_PIXEL_SIZE * 8 + 1;
 
   if(!is_clip_d()){
     clip_d['x']  = cx;
     clip_d['y']  = cy;
 
-    ctx.globalAlpha = 0.5;
-    ctx.fillStyle = EDITOR_CUR;
-    ctx.fillRect(cux, cuy, CLIP_PIXEL_SIZE * 8 + 2, CLIP_PIXEL_SIZE * 8 + 2);
-    ctx.globalAlpha = 1.0;
+    //set_cursor_rect(x,y,w,h,EDITOR_CUR);
+    set_cursor_fillrect(x,y,w + 1,h + 1,EDITOR_CUR,0.5);
 
   }else if(clip_d['x'] == cx && clip_d['y'] == cy){
     redraw_clip();
