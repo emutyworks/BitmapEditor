@@ -5,7 +5,7 @@ Arduboy Web-based bitmap editor
 Copyright (c) 2016 emutyworks
 
 Released under the MIT license
-http://opensource.org/licenses/mit-license.php
+https://github.com/emutyworks/BitmapEditor/blob/master/LICENSE.txt
 -->
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
 <head>
@@ -18,6 +18,7 @@ http://opensource.org/licenses/mit-license.php
 <script type="text/javascript" src="js/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="js/init.js"></script>
 <script type="text/javascript" src="js/editor.js"></script>
+<script type="text/javascript" src="js/edit.js"></script>
 <script type="text/javascript" src="js/clipboard.js"></script>
 <script type="text/javascript" src="js/cursor.js"></script>
 <script type="text/javascript" src="js/main.js"></script>
@@ -28,7 +29,7 @@ http://opensource.org/licenses/mit-license.php
 <a href="javascript:change_edit_pixel(16,16);">16x16</a> | 
 <a href="javascript:change_edit_pixel(32,32);">32x32</a> | 
 <a href="javascript:change_edit_pixel(64,64);">64x64</a> | 
-<a href="javascript:change_edit_pixel(128,64);">128x64</a>
+<a href="javascript:change_edit_pixel(128,64);">128x64</a>&nbsp;
 <b>Data:</b>
 <a id="download" href="" download="" onclick="data_download()"　target="_blank">Download</a> | 
 Upload <input type="file" id="data_upload" accept="text/*"><br>
@@ -47,10 +48,11 @@ Upload <input type="file" id="data_upload" accept="text/*"><br>
 <span id="edit_info"></span> min_w:<input type="text" name="min_w" id="min_w"> min_h:<input type="text" name="min_h" id="min_h">&nbsp;
 
 <b>Edit:</b>
-<a href="javascript:edit_cut();">Cut</a> | 
-<a href="javascript:edit_copy();">Copy</a> | 
-<a href="javascript:edit_paste();">Paste</a> | 
-<input type="checkbox" name="edit_alert" id="edit_alert" onclick="set_edit_alert()" value="">No confirmation
+<a href="javascript:edit_cut();">Cut(X)</a> | 
+<a href="javascript:edit_copy();">Copy(C)</a> | 
+<a href="javascript:edit_paste();">Paste(V)</a> | 
+<a href="javascript:edit_cancel();">Cancel</a> | 
+<input type="checkbox" name="edit_alert" id="edit_alert" onclick="set_edit_alert()" value="" checked>No confirmation
 </span>
 
 <canvas id="editor" width="" height=""></canvas>
