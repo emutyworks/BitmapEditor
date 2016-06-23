@@ -1,10 +1,10 @@
 /*
- Arduboy Web-based bitmap editor
+Arduboy Web-based bitmap editor
 
- Copyright (c) 2016 emutyworks
+Copyright (c) 2016 emutyworks
 
- Released under the MIT license"
- http://opensource.org/licenses/mit-license.php
+Released under the MIT license
+https://github.com/emutyworks/BitmapEditor/blob/master/LICENSE.txt
 */
 window.onload = function(){
   editor = document.getElementById('editor');
@@ -25,18 +25,40 @@ window.onload = function(){
       return "Do you want to reload this site? Changes mane may not be saved.";
   });
 */
+
+  $(function($){
+    $(window).keydown(function(e){
+      if(event.ctrlKey){
+        if(e.keyCode === 67){
+          edit_copy();
+          return false;
+        }
+        if(e.keyCode === 86){
+          edit_paste();
+          return false;
+        }
+        if(e.keyCode === 88){
+          edit_cut();
+          return false;
+        }
+      }
+    });
+  });
+
   /* canvas mouse event */
   function onMouseDown(e){
     mousePos(e);
 
+    //clipboard
     if(check_clip_area()){
-      if(event.shiftKey){
-        select_clip_d();
+      if(event.shiftKey && !cur_info['down'] && !cur_info['rect']){
+        start_clip_cur();
       }
     }
 
+    //editor
     if(check_edit_area()){
-      if(event.shiftKey){
+      if(event.shiftKey && !cur_info['c_down'] && !cur_info['c_rect']){
         start_cur();
       }else{
         change_bw();
@@ -47,10 +69,27 @@ window.onload = function(){
 
   function onMouseMove(e){
     mousePos(e);
-    view_edit_info();
 
+    //clipboard
+    if(check_clip_area()){
+      if(event.shiftKey && !cur_info['down'] && !cur_info['rect']){
+        if(cur_info['c_down']){
+          drag_clip_cur();
+        }
+      }else{
+        if(cur_info['c_down']){
+          end_clip_cur();
+        }
+      }
+    }else{
+      del_edit_mes();
+    }
+
+    //editor
     if(check_edit_area()){
-      if(event.shiftKey){
+      view_edit_info();
+
+      if(event.shiftKey && !cur_info['c_down'] && !cur_info['c_rect']){
         if(cur_info['down']){
           drag_cur();
         }
@@ -94,7 +133,6 @@ window.onload = function(){
     if($('#min_h').val() == 0){ $('#min_h').attr({ value: 1 }); }
     cur_info['min_w'] = parseInt($('#min_w').val(),10);
     cur_info['min_h'] = parseInt($('#min_h').val(),10);
-
   }
 
   /* data upload */
@@ -145,8 +183,6 @@ window.onload = function(){
       clipboard = clipboard_data.split(',');
       set_data();
       set_clip_data();
-
-      console.log(up_d);
     };
 
     if(!String.prototype.trim){

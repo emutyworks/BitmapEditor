@@ -1,53 +1,126 @@
 /*
- Arduboy Web-based bitmap editor
+Arduboy Web-based bitmap editor
 
- Copyright (c) 2016 emutyworks
+Copyright (c) 2016 emutyworks
 
- Released under the MIT license"
- http://opensource.org/licenses/mit-license.php
+Released under the MIT license
+https://github.com/emutyworks/BitmapEditor/blob/master/LICENSE.txt
 */
 function paste_edit_clip(){
-  var view_x = cur_info['view_x'];
-  var view_y = cur_info['view_y'];
-  var view_w = cur_info['view_w'];
-  var view_h = cur_info['view_h'];
+  if(check_select_area() == 'edit'){
+    var view_x = cur_info['view_x'];
+    var view_y = cur_info['view_y'];
+    var view_w = cur_info['view_w'];
+    var view_h = cur_info['view_h'];
 
-  if(edit_clip){
-    for(var y = 0; y < view_h; y++){
-      for(var x = 0; x < view_w; x++){
-        var dx = x + view_x;
-        var dy = y + view_y;
-
-        var bw = edit_clip[y][x];
-        set_bw(dx, dy, bw);
+    if(edit_clip){
+      for(var y = 0; y < view_h; y++){
+        for(var x = 0; x < view_w; x++){
+          var dx = x + view_x;
+          var dy = y + view_y;
+          try{
+            var bw = edit_clip[y][x];
+            set_bw(dx, dy, bw);
+          }catch(e){}
+        }
       }
     }
+    del_cur();
+    cur_info['rect'] = false;
+
+  }else if(check_select_area() == 'clip'){
+    var c_clip_x = cur_info['c_view_x'];
+    var c_clip_y = cur_info['c_view_y'];
+    var c_clip_w = cur_info['c_view_w'];
+    var c_clip_h = cur_info['c_view_h'];
+
+    if(edit_clip){
+      for(var y = 0; y < c_clip_h * 8; y++){
+        for(var x = 0; x < c_clip_w * 8; x++){
+          try{
+            var bw = edit_clip[y][x];
+            set_clip_bw(x + (c_clip_x * 8), y + (c_clip_y * 8), bw);
+          }catch(e){}
+        }
+      }
+    }
+    set_clip_data();
+    del_clip_cur();
+    cur_info['c_rect'] = false;
   }
-  del_cur();
-  cur_info['rect'] = false;
+}
+
+function set_clip_bw(x,y,bw){
+  var p = x + (CLIP_MAX_X * 8 * (parseInt(y / 8)));
+  var py = parseInt(y % 8);
+
+  if((x > CLIP_MAX_X * 8) || (y > CLIP_MAX_Y * 8)){
+    return false;
+  }
+
+  if(bw==1){
+    clipboard[p] = '0x' + ('00' + parseInt((clipboard[p] | set_w[py]),10).toString(16)).slice(-2);
+  }else{
+    clipboard[p] = '0x' + ('00' + parseInt((clipboard[p] & set_b[py]),10).toString(16)).slice(-2);
+  }
 }
 
 function set_edit_clip(){
-  var clip_x = cur_info['view_x'];
-  var clip_y = cur_info['view_y'];
-  var clip_w = cur_info['view_w'];
-  var clip_h = cur_info['view_h'];
-  cur_info['clip_x'] = clip_x;
-  cur_info['clip_y'] = clip_y;
-  cur_info['clip_w'] = clip_w;
-  cur_info['clip_h'] = clip_h;
+  if(check_select_area() == 'edit'){
+    var clip_x = cur_info['view_x'];
+    var clip_y = cur_info['view_y'];
+    var clip_w = cur_info['view_w'];
+    var clip_h = cur_info['view_h'];
+    var c_clip_w = parseInt(cur_info['view_w'] / 8);
+    var c_clip_h = parseInt(cur_info['view_h'] / 8);
 
-  edit_clip = new Array();
+    cur_info['clip_x'] = clip_x;
+    cur_info['clip_y'] = clip_y;
+    cur_info['clip_w'] = clip_w;
+    cur_info['clip_h'] = clip_h;
 
-  for(var y = 0; y < clip_h; y++){
-    var row = new Array();
-    for(var x = 0; x < clip_w; x++){
-      row[x] = get_d(x + clip_x,y + clip_y);
+    if((cur_info['view_w'] % 8) > 0){ c_clip_w++; }
+    if((cur_info['view_h'] % 8) > 0){ c_clip_h++; }
+    cur_info['c_clip_w'] = c_clip_w;
+    cur_info['c_clip_h'] = c_clip_h;
+    
+    edit_clip = new Array();
+
+    for(var y = 0; y < clip_h; y++){
+      var row = new Array();
+      for(var x = 0; x < clip_w; x++){
+        row[x] = get_d(x + clip_x, y + clip_y);
+      }
+      edit_clip[y] = row;
     }
-    edit_clip[y] = row;
+    del_cur();
+    cur_info['rect'] = false;
+
+  }else if(check_select_area() == 'clip'){
+    var c_clip_x = cur_info['c_view_x'];
+    var c_clip_y = cur_info['c_view_y'];
+    var c_clip_w = cur_info['c_view_w'];
+    var c_clip_h = cur_info['c_view_h'];
+    cur_info['c_clip_x'] = c_clip_x;
+    cur_info['c_clip_y'] = c_clip_y;
+    cur_info['c_clip_w'] = c_clip_w;
+    cur_info['c_clip_h'] = c_clip_h;
+
+    cur_info['clip_w'] = c_clip_w * 8;
+    cur_info['clip_h'] = c_clip_h * 8;
+
+    edit_clip = new Array();
+
+    for(var y = 0; y < c_clip_h * 8; y++){
+      var row = new Array();
+      for(var x = 0; x < c_clip_w * 8; x++){
+        row[x] = get_clip(x + (c_clip_x * 8), y + (c_clip_y * 8));
+      }
+      edit_clip[y] = row;
+    }
+    del_clip_cur();
+    cur_info['c_rect'] = false;
   }
-  del_cur();
-  cur_info['rect'] = false;
 }
 
 function start_cur(){
@@ -78,7 +151,6 @@ function end_cur(){
   set_cursor_fillrect(x,y,w,h,EDITOR_CUR,0.5);
   del_edit_mes();
 }
-
 
 function drag_cur(){
   var dx = cur_info['dx'];
@@ -138,4 +210,11 @@ function set_cursor_rect(x,y,w,h,color){
   c_ctx.fillRect(x, y + h, w + 1, 1);
 }
 
-
+function check_select_area(){
+  if(cur_info['rect'] == true){
+    return 'edit';
+  }else if(cur_info['c_rect'] == true){
+    return 'clip';
+  }
+  return false;
+}

@@ -1,3 +1,11 @@
+/*
+Arduboy Web-based bitmap editor
+
+Copyright (c) 2016 emutyworks
+
+Released under the MIT license
+https://github.com/emutyworks/BitmapEditor/blob/master/LICENSE.txt
+*/
 body, input {
   font-family: helvetica, arial, sans-serif;
   font-size: 9pt;
@@ -38,3 +46,10 @@ body, input {
 	left: 0px;
 	top: 0px;
   }
+/*
+#hx {
+	position: absolute;
+	z-index: 1;
+	left: 0px;
+  }
+ */
