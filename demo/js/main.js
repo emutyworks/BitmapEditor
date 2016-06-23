@@ -28,7 +28,7 @@ window.onload = function(){
 
   $(function($){
     $(window).keydown(function(e){
-      if(event.ctrlKey){
+      if(e.ctrlKey){
         if(e.keyCode === 67){
           edit_copy();
           return false;
@@ -51,14 +51,14 @@ window.onload = function(){
 
     //clipboard
     if(check_clip_area()){
-      if(event.shiftKey && !cur_info['down'] && !cur_info['rect']){
+      if(e.shiftKey && !cur_info['down'] && !cur_info['rect']){
         start_clip_cur();
       }
     }
 
     //editor
     if(check_edit_area()){
-      if(event.shiftKey && !cur_info['c_down'] && !cur_info['c_rect']){
+      if(e.shiftKey && !cur_info['c_down'] && !cur_info['c_rect']){
         start_cur();
       }else{
         change_bw();
@@ -72,7 +72,7 @@ window.onload = function(){
 
     //clipboard
     if(check_clip_area()){
-      if(event.shiftKey && !cur_info['down'] && !cur_info['rect']){
+      if(e.shiftKey && !cur_info['down'] && !cur_info['rect']){
         if(cur_info['c_down']){
           drag_clip_cur();
         }
@@ -89,7 +89,7 @@ window.onload = function(){
     if(check_edit_area()){
       view_edit_info();
 
-      if(event.shiftKey && !cur_info['c_down'] && !cur_info['c_rect']){
+      if(e.shiftKey && !cur_info['c_down'] && !cur_info['c_rect']){
         if(cur_info['down']){
           drag_cur();
         }
