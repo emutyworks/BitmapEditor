@@ -28,7 +28,7 @@ window.onload = function(){
 
   $(function($){
     $(window).keydown(function(e){
-      if(e.ctrlKey){
+      if(e.ctrlKey || (e.metaKey && is_mac()) ){
         if(e.keyCode === 67){
           edit_copy();
           return false;
@@ -218,6 +218,14 @@ function data_download(){
     window.navigator.msSaveBlob(blob, filename); 
   }else{
     document.getElementById("download").href = window.URL.createObjectURL(blob);
+  }
+}
+
+function is_mac(){
+  if(navigator.userAgent.indexOf('Mac') != -1){
+    return true;
+  }else{
+    return false;
   }
 }
 
