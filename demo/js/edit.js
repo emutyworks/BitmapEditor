@@ -133,7 +133,7 @@ function edit_paste(){
 
   if(!check_select_area()){
     set_edit_mes('no_rect_paste');
-    return false;
+    return;
   }
 
   var flag = true;
@@ -150,7 +150,7 @@ function edit_paste(){
 function edit_copy(){
   if(!check_select_area()){
     set_edit_mes('no_rect_copy');
-    return false;
+    return;
   }
   set_edit_clip();
   edit_exit();
