@@ -9,7 +9,6 @@ https://github.com/emutyworks/BitmapEditor/blob/master/LICENSE.txt
 function redraw_editor(){
   init_editor();
   set_data();
-
   redraw_clip();
 }
 
@@ -68,12 +67,11 @@ function change_edit_pixel(x,y){
     init_editor();
 
     redraw_clip();
-    console.log(EDITOR_MAX_Y);
   }
 }
 
 function change_bw(){
-  if(check_edit_area()){
+  if(check_edit_area() && !cur_info['rect'] && !cur_info['c_rect']){
     var dx = cur_info['dx'];
     var dy = cur_info['dy'];
     var bw = get_d(dx,dy);
@@ -86,25 +84,31 @@ function change_bw(){
   }
 }
 
-function set_bw(dx,dy,bw){
+function set_bw(dx,dy,bw,mode){
   var x = dx + parseInt(dy / 8) * MAX_PIXEL_X;
   var y = dy % 8;
 
-  if(MAX_PIXEL_X < dx + 1 || MAX_PIXEL_Y < dy + 1){
+  if(MAX_PIXEL_X < dx + 1 || MAX_PIXEL_Y < dy + 1 || dx < 0 || dy < 0){
     return false;
   }
 
-  if(bw==1){
-    d[x] = '0x' + ('00' + parseInt((d[x] | set_w[y]),10).toString(16)).slice(-2);
-    ctx.fillStyle = EDITOR_W;
+  if(mode != 'cur'){
+    if(bw==1){
+      d[x] = '0x' + ('00' + parseInt((d[x] | set_w[y]),10).toString(16)).slice(-2);
+      ctx.fillStyle = EDITOR_W;
+    }else{
+      d[x] = '0x' + ('00' + parseInt((d[x] & set_b[y]),10).toString(16)).slice(-2);
+      ctx.fillStyle = EDITOR_B; 
+    }
+    ctx.fillRect(dx * PIXEL_SIZE + 1, (dy * PIXEL_SIZE + 1) + EDITOR_MAIN_Y, PIXEL_SIZE - 1, PIXEL_SIZE - 1);
+    ctx.fillRect((dx * PRE_PIXEL_SIZE) + EDITOR_PRE_X + 1, (dy * PRE_PIXEL_SIZE) + EDITOR_PRE_Y + 1, PRE_PIXEL_SIZE, PRE_PIXEL_SIZE);    
 
   }else{
-    d[x] = '0x' + ('00' + parseInt((d[x] & set_b[y]),10).toString(16)).slice(-2);
-    ctx.fillStyle = EDITOR_B;
-  
+    if(bw==1){
+      c_ctx.fillStyle = EDITOR_W;
+      c_ctx.fillRect(dx * PIXEL_SIZE + 1, (dy * PIXEL_SIZE + 1) + EDITOR_MAIN_Y, PIXEL_SIZE - 1, PIXEL_SIZE - 1);
+    }
   }
-  ctx.fillRect(dx * PIXEL_SIZE + 1, (dy * PIXEL_SIZE + 1) + EDITOR_MAIN_Y, PIXEL_SIZE - 1, PIXEL_SIZE - 1);
-  ctx.fillRect((dx * PRE_PIXEL_SIZE) + EDITOR_PRE_X + 1, (dy * PRE_PIXEL_SIZE) + EDITOR_PRE_Y + 1, PRE_PIXEL_SIZE, PRE_PIXEL_SIZE);
 
   if(view_hx){
     $('#hx').val(get_hx_str());
@@ -169,22 +173,9 @@ function get_d(dx,dy){
 }
 
 function set_data(){
-  var x = cur_info['view_x'];
-  var y = cur_info['view_y'];
-  var w = cur_info['view_w'];
-  var h = cur_info['view_h'];
-
-  if(w > 0 && h > 0){
-    for(var dy = y; dy < y + h; dy++){
-      for(var dx = x; dx < x + w; dx++){
-        set_bw(dx,dy,get_d(dx,dy));
-      }
-    }
-  }else{
-    for(var dy = 0; dy < MAX_PIXEL_Y; dy++){
-      for(var dx = 0; dx < MAX_PIXEL_X; dx++){
-        set_bw(dx,dy,get_d(dx,dy));
-      }
+  for(var dy = 0; dy < MAX_PIXEL_Y; dy++){
+    for(var dx = 0; dx < MAX_PIXEL_X; dx++){
+      set_bw(dx,dy,get_d(dx,dy));
     }
   }
 }

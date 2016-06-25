@@ -24,6 +24,7 @@ var CUR_MIN_H = 4;
 var EDITOR_LINE = "#808080";
 var EDITOR_GUIDE = "#e0e080";
 var EDITOR_CUR = "#ff0000";
+var EDITOR_DRAG = "#ffff00";
 var EDITOR_W = "#ffffff";
 var EDITOR_B = "#000000";
 var EDITOR_MENU_SIZE = 50;
@@ -115,6 +116,9 @@ function init_editor(){
   var view_w = cur_info['view_w'];
   var view_h = cur_info['view_h'];
 
+  if(view_x < 0){ view_x = 0; }
+  if(view_y < 0){ view_y = 0; }
+
   if(view_w > 0 && view_h > 0){
     //preview
     var p_fill_x = view_x * PRE_PIXEL_SIZE;
@@ -133,19 +137,16 @@ function init_editor(){
     set_editor_rect(EDITOR_PRE_X, EDITOR_PRE_Y, pre_max_x, pre_max_y + 2, EDITOR_LINE + 2);
 
     //editor
-    var fill_x = view_x * PIXEL_SIZE;
-    var fill_y = view_y * PIXEL_SIZE;
-    var fill_w = view_w * PIXEL_SIZE;
-    var fill_h = view_h * PIXEL_SIZE;
-    var check_x = max_x - (fill_x + fill_w);
-    var check_y = max_y - (fill_y + fill_h);
-    var add_w = 0; 
-    var add_h = 0;
-    if(check_x < 0){ add_w = check_x; }
-    if(check_y < 0){ add_h = check_y; }
+    init_editor_block(view_x,view_y,view_w,view_h,max_x,max_y);
 
-    ctx.fillStyle = EDITOR_B;
-    ctx.fillRect(fill_x, fill_y + EDITOR_MAIN_Y, fill_w + add_w, fill_h + add_h);
+    init_editor_block(
+      cur_info['clip_x'],
+      cur_info['clip_y'],
+      cur_info['clip_w'],
+      cur_info['clip_h'],
+      max_x,
+      max_y
+    );
 
   }else{
     $('#editor').attr({
@@ -175,6 +176,23 @@ function init_editor(){
   });
 
   $('#hx').css('top', EDITOR_MAX_Y);
+}
+
+function init_editor_block(view_x,view_y,view_w,view_h,max_x,max_y){
+  //editor
+  var fill_x = view_x * PIXEL_SIZE;
+  var fill_y = view_y * PIXEL_SIZE;
+  var fill_w = view_w * PIXEL_SIZE;
+  var fill_h = view_h * PIXEL_SIZE;
+  var check_x = max_x - (fill_x + fill_w);
+  var check_y = max_y - (fill_y + fill_h);
+  var add_w = 0; 
+  var add_h = 0;
+  if(check_x < 0){ add_w = check_x; }
+  if(check_y < 0){ add_h = check_y; }
+
+  ctx.fillStyle = EDITOR_B;
+  ctx.fillRect(fill_x, fill_y + EDITOR_MAIN_Y, fill_w + add_w, fill_h + add_h);
 }
 
 function init_editor_guide(){
@@ -280,11 +298,12 @@ function init_edit_data(){
   if(is_mac()){ CtrlKeyText = 'Command'; }
 
   edit_mes = {
-    start_cur: 'SHIFT key press + Mouse move -> SHIFT key up',
+    start_cur: 'SHIFT key press + Mouse drag -> Mouse up (SHIFT key press)',
     no_rect: 'Please select a area (SHIFT key press + Mouse move)',
     no_rect_cut: 'Please select a area (SHIFT key press + Mouse move) -> Click ' + CtrlKeyText + ' + X',
     no_rect_copy: 'Please select a area (SHIFT key press + Mouse move) -> Click ' + CtrlKeyText + ' + C',
     no_rect_paste: 'Please select a area (SHIFT key press + Mouse move) -> Click ' + CtrlKeyText + ' + V',
+    drag_paste: 'Mouse drag (SHIFT key press) -> SHIFT key up -> Paste',
   };
 
 }

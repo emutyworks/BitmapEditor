@@ -16,8 +16,6 @@ function edit_invert(){
     var view_w = cur_info['view_w'];
     var view_h = cur_info['view_h'];
 
-    set_edit_clip();
-
     for(var y = 0; y < view_h; y++){
       for(var x = 0; x < view_w; x++){
         var dx = x + view_x;
@@ -47,8 +45,6 @@ function edit_counter_clockwize(){
     var view_w = cur_info['view_w'];
     var view_h = cur_info['view_h'];
 
-    set_edit_clip();
-
     for(var y = 0; y < view_h; y++){
       var dy = view_y - 1;
       for(var x = view_w; x >= 0; x--){
@@ -71,8 +67,6 @@ function edit_clockwize(){
     var view_w = cur_info['view_w'];
     var view_h = cur_info['view_h'];
 
-    set_edit_clip();
-
     var dx = view_x + view_h - 1
     for(var y = 0; y < view_h; y++){
       for(var x = 0; x < view_w; x++){
@@ -94,8 +88,6 @@ function edit_half_turn(){
     var view_y = cur_info['view_y'];
     var view_w = cur_info['view_w'];
     var view_h = cur_info['view_h'];
-
-    set_edit_clip();
 
     var y = 0;
     for(var dy = view_h - 1; dy >= 0; dy--){
@@ -121,8 +113,6 @@ function edit_horisonal(){
     var view_w = cur_info['view_w'];
     var view_h = cur_info['view_h'];
 
-    set_edit_clip();
-
     var dx = view_x + view_w - 1;
     for(var x = 0; x < view_w; x++){
       for(var y = 0; y < view_h; y++){
@@ -144,8 +134,6 @@ function edit_vertical(){
     var view_y = cur_info['view_y'];
     var view_w = cur_info['view_w'];
     var view_h = cur_info['view_h'];
-
-    set_edit_clip();
 
     var dy = view_y + view_h - 1;  
     for(var y = 0; y < view_h; y++){
@@ -191,27 +179,47 @@ function edit_copy(){
     set_edit_mes('no_rect_copy');
     return;
   }
-  set_edit_clip();
   edit_exit();
 }
 
 function edit_cut(){
   var mes = 'cut';
-  var flag = edit_confirm(mes);
+
+  if(!check_select_area()){
+    set_edit_mes('no_rect_paste');
+    return;
+  }
+
+  var flag = true;
+  if(edit_alert){
+    flag = edit_confirm_alert(mes);
+  }
 
   if(flag){
-    var view_x = cur_info['view_x'];
-    var view_y = cur_info['view_y'];
-    var view_w = cur_info['view_w'];
-    var view_h = cur_info['view_h'];
+    if(check_select_area() == 'edit'){
+      var view_x = cur_info['view_x'];
+      var view_y = cur_info['view_y'];
+      var view_w = cur_info['view_w'];
+      var view_h = cur_info['view_h'];
 
-    set_edit_clip();
+      for(var y = 0; y < view_h; y++){
+        for(var x = 0; x < view_w; x++){
+          var dx = x + view_x;
+          var dy = y + view_y;
+          set_bw(dx, dy, 0);
+        }
+      }
+    }else if(check_select_area() == 'clip'){
+      var c_clip_x = cur_info['c_view_x'];
+      var c_clip_y = cur_info['c_view_y'];
+      var c_clip_w = cur_info['c_view_w'];
+      var c_clip_h = cur_info['c_view_h'];
 
-    for(var y = 0; y < view_h; y++){
-      for(var x = 0; x < view_w; x++){
-        var dx = x + view_x;
-        var dy = y + view_y;
-        set_bw(dx, dy, 0);
+      for(var y = 0; y < c_clip_h; y++){
+        for(var x = 0; x < (c_clip_w * 8); x++){
+          var p = (x + c_clip_x * 8) + ((y + c_clip_y) * CLIP_MAX_X * 8);
+          clipboard[p] = '0x00';
+        }
       }
     }
   }
@@ -223,14 +231,14 @@ function edit_cancel(){
 }
 
 function edit_exit(){
-  del_cur();
+  del_cur_all();
   cur_info['rect'] = false;
   cur_info['c_rect'] = false;
   redraw_editor();
 }
 
 function edit_confirm(mes){
-  if(check_select_area()!='edit'){
+  if(!cur_info['rect']){
     set_edit_mes('no_rect');
     return false;
   }

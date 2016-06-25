@@ -31,7 +31,6 @@ function paste_edit_clip(){
         }
       }
     }
-
   }else if(check_select_area() == 'clip'){
     var c_clip_x = cur_info['c_view_x'];
     var c_clip_y = cur_info['c_view_y'];
@@ -43,12 +42,12 @@ function paste_edit_clip(){
         for(var x = 0; x < c_clip_w * 8; x++){
           try{
             var bw = edit_clip[y][x];
-            if(merge_paste){
+            if(!merge_paste){
+                set_clip_bw(x + (c_clip_x * 8), y + (c_clip_y * 8), bw);
+            }else{
               if(bw == 1){
                 set_clip_bw(x + (c_clip_x * 8), y + (c_clip_y * 8), bw);
               }
-            }else{
-                set_clip_bw(x + (c_clip_x * 8), y + (c_clip_y * 8), bw);
             }
          }catch(e){}
         }
@@ -132,7 +131,13 @@ function start_cur(){
   var w = cur_info['min_w'];
   var h = cur_info['min_h'];
 
+  if(cur_info['rect']){
+    init_editor();
+    reset_data();
+  }
+
   cur_info['down'] = true;
+  cur_info['rect'] = false;
 
   if(cur_info['clip_w'] > 0 && cur_info['clip_h'] > 0){
     w = cur_info['clip_w'];
@@ -149,10 +154,55 @@ function end_cur(){
   var w = cur_info['view_w'] * PIXEL_SIZE;
   var h = cur_info['view_h'] * PIXEL_SIZE;
 
-  cur_info['down'] = false;
+  set_editor_fillrect(x,y,w,h,EDITOR_CUR,0.5);
+
   cur_info['rect'] = true;
-  set_cursor_fillrect(x,y,w,h,EDITOR_CUR,0.5);
-  del_edit_mes();
+  set_edit_mes('drag_paste');
+}
+
+
+function view_cur_bw(){
+  var view_x = cur_info['view_x'];
+  var view_y = cur_info['view_y'];
+  var view_w = cur_info['view_w'];
+  var view_h = cur_info['view_h'];
+
+  if(edit_clip){
+    for(var y = 0; y < view_h; y++){
+      for(var x = 0; x < view_w; x++){
+        var dx = x + view_x;
+        var dy = y + view_y;
+        try{
+          var bw = edit_clip[y][x];
+          set_bw(dx, dy, bw, 'cur');
+        }catch(e){}
+      }
+    }
+  }
+}
+
+function view_cur(){
+  del_cur_all();
+  view_cur_bw();
+
+  if(cur_info['dx'] > cur_info['view_x']){
+    cur_info['view_x'] = cur_info['dx'] - cur_info['view_w'];
+  }else{
+    cur_info['view_x'] = cur_info['dx'];
+  }
+  if(cur_info['dy'] > cur_info['view_y']){
+    cur_info['view_y'] = cur_info['dy'] - cur_info['view_h'];
+  }else{
+    cur_info['view_y'] = cur_info['dy'];
+  }
+
+  var x = cur_info['view_x'] * PIXEL_SIZE;
+  var y = cur_info['view_y'] * PIXEL_SIZE + EDITOR_MAIN_Y;
+  var w = cur_info['view_w'] * PIXEL_SIZE;
+  var h = cur_info['view_h'] * PIXEL_SIZE;
+
+  set_cursor_rect(x,y,w,h,EDITOR_DRAG,1.0);
+  set_cursor_fillrect(x,y,w,h,EDITOR_DRAG,0.5);
 }
 
 function drag_cur(){
@@ -198,6 +248,10 @@ function del_cur(){
   c_ctx.clearRect(x, y, w + 1, h + 1);
 }
 
+function del_cur_all(){
+  c_ctx.clearRect(0, 0, EDITOR_MAX_X, EDITOR_MAX_Y);
+}
+
 function set_cursor_fillrect(x,y,w,h,color,alpha){
   c_ctx.globalAlpha = alpha;
   c_ctx.fillStyle = color;
@@ -214,9 +268,9 @@ function set_cursor_rect(x,y,w,h,color){
 }
 
 function check_select_area(){
-  if(cur_info['rect'] == true){
+  if(check_edit_area()){
     return 'edit';
-  }else if(cur_info['c_rect'] == true){
+  }else if(check_clip_area()){
     return 'clip';
   }
   return false;
