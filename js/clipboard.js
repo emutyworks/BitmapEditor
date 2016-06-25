@@ -55,6 +55,7 @@ function set_clip_cur(cx,cy,cw,ch){
   var h = ch * CLIP_BLOCK_SIZE;
 
   del_clip_cur();
+  
   cur_info['c_view_x'] = cx;
   cur_info['c_view_y'] = cy;
   cur_info['c_view_w'] = cw;

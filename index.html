@@ -29,8 +29,8 @@ https://github.com/emutyworks/BitmapEditor/blob/master/LICENSE.txt
 <a href="javascript:change_edit_pixel(16,16);">16x16</a> | 
 <a href="javascript:change_edit_pixel(32,32);">32x32</a> | 
 <a href="javascript:change_edit_pixel(64,64);">64x64</a> | 
-<a href="javascript:change_edit_pixel(128,64);">128x64</a>&nbsp;
-<b>Data:</b>
+<a href="javascript:change_edit_pixel(128,64);">128x64</a> 
+<input type="checkbox" name="view_hx" id="view_hx" onclick="set_view_hx()" value="">View Hex Data &nbsp;
 <a id="download" href="" download="" onclick="data_download()"　target="_blank">Download</a> | 
 Upload <input type="file" id="data_upload" accept="text/*"><br>
 <b>Memo:</b> <input type="text" name="memo" id="memo"><br>
@@ -42,7 +42,9 @@ Upload <input type="file" id="data_upload" accept="text/*"><br>
 <a href="javascript:edit_clockwize();">Clockwize</a> | 
 <a href="javascript:edit_counter_clockwize();">Counter Clockwize</a> | 
 <a href="javascript:edit_horisonal();">Horisonal</a> | 
-<a href="javascript:edit_vertical();">Vertical</a>&nbsp;
+<a href="javascript:edit_vertical();">Vertical</a>
+<b>Image</b>
+<a href="javascript:edit_invert();">Invert</a>&nbsp;
 <span id="edit_mes"></span>
 <br>
 <span id="edit_info"></span> min_w:<input type="text" name="min_w" id="min_w"> min_h:<input type="text" name="min_h" id="min_h">&nbsp;
@@ -50,11 +52,12 @@ Upload <input type="file" id="data_upload" accept="text/*"><br>
 <b>Edit:</b>
 <a href="javascript:edit_cut();">Cut(X)</a> | 
 <a href="javascript:edit_copy();">Copy(C)</a> | 
-<a href="javascript:edit_paste();">Paste(V)</a> | 
+<a href="javascript:edit_paste();">Paste(V)</a><input type="checkbox" name="merge_paste" id="merge_paste" onclick="set_merge_paste()" value="">Merge | 
 <a href="javascript:edit_cancel();">Cancel</a> | 
 <input type="checkbox" name="edit_alert" id="edit_alert" onclick="set_edit_alert()" value="" checked>No confirmation
 </span>
 
+<textarea id="hx" rows="30" cols="110"></textarea><br>
 <canvas id="editor" width="" height=""></canvas>
 <canvas id="cursor" width="" height=""></canvas>
 </div>

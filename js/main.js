@@ -194,7 +194,7 @@ window.onload = function(){
 }
 
 /*
- * other
+ * download
  */
 function data_download(){
   var dt = new Date();
@@ -221,25 +221,4 @@ function data_download(){
   }
 }
 
-function is_mac(){
-  if(navigator.userAgent.indexOf('Mac') != -1){
-    return true;
-  }else{
-    return false;
-  }
-}
 
-function set_edit_mes(key){
-  $('#edit_mes').html(edit_mes[key]);
-}
-
-function del_edit_mes(){
-  $('#edit_mes').html('');
-}
-
-function cnv16to2(hx){
-  return ('00000000' + parseInt(hx,16).toString(2)).slice(-8);
-}
-function cnv2to16(b){
-  return '0x' + ('00' + parseInt(b,2).toString(16)).slice(-2);
-}
