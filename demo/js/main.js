@@ -20,6 +20,8 @@ window.onload = function(){
   $('#min_w').attr({ value: cur_info['min_w'] });
   $('#min_h').attr({ value: cur_info['min_h'] });
 
+  $('#merge_paste').prop("checked",false);
+
 /*
   $(window).on('beforeunload', function() {
       return "Do you want to reload this site? Changes mane may not be saved.";
@@ -28,6 +30,10 @@ window.onload = function(){
 
   $(function($){
     $(window).keydown(function(e){
+      if(e.keyCode === 27){
+          edit_cancel();
+          return false;
+      }
       if(e.ctrlKey || (e.metaKey && is_mac()) ){
         if(e.keyCode === 67){
           edit_copy();
@@ -43,6 +49,26 @@ window.onload = function(){
         }
       }
     });
+    $(window).keyup(function(e){
+      if(!e.shiftKey){
+        cur_info['down'] = false;
+        cur_info['c_down'] = false;
+
+        //clipboard
+        if(check_clip_area()){
+          if(cur_info['c_clip_x'] != cur_info['c_view_x'] || cur_info['c_clip_y'] != cur_info['c_view_y']){
+            edit_paste();  
+          }
+        }
+
+        //editor
+        if(check_edit_area()){
+          if(cur_info['clip_x'] != cur_info['view_x'] || cur_info['clip_y'] != cur_info['view_y']){
+            edit_paste();  
+          }
+        }
+      }
+    });
   });
 
   /* canvas mouse event */
@@ -51,14 +77,16 @@ window.onload = function(){
 
     //clipboard
     if(check_clip_area()){
-      if(e.shiftKey && !cur_info['down'] && !cur_info['rect']){
+      if(e.shiftKey && !cur_info['c_down'] 
+        && !cur_info['down'] && !cur_info['rect']){
         start_clip_cur();
       }
     }
 
     //editor
     if(check_edit_area()){
-      if(e.shiftKey && !cur_info['c_down'] && !cur_info['c_rect']){
+      if(e.shiftKey && !cur_info['down'] 
+        && !cur_info['c_down'] && !cur_info['c_rect']){
         start_cur();
       }else{
         change_bw();
@@ -67,42 +95,98 @@ window.onload = function(){
     }
   }
 
-  function onMouseMove(e){
+  function onMouseUp(e){
     mousePos(e);
 
     //clipboard
     if(check_clip_area()){
-      if(e.shiftKey && !cur_info['down'] && !cur_info['rect']){
-        if(cur_info['c_down']){
-          drag_clip_cur();
-        }
-      }else{
-        if(cur_info['c_down']){
-          end_clip_cur();
-        }
+      if(e.shiftKey && cur_info['c_down'] && !cur_info['c_rect'] 
+        && !cur_info['down'] && !cur_info['rect']){
+        end_clip_cur();
+        set_edit_clip();
       }
-    }else{
-      del_edit_mes();
     }
 
     //editor
     if(check_edit_area()){
       view_edit_info();
 
-      if(e.shiftKey && !cur_info['c_down'] && !cur_info['c_rect']){
-        if(cur_info['down']){
-          drag_cur();
-        }
-      }else{
-        if(cur_info['down']){
-          end_cur();
+      if(e.shiftKey && cur_info['down'] && !cur_info['rect'] 
+        && !cur_info['c_down'] && !cur_info['c_rect']){
+        end_cur();
+        set_edit_clip();
+      }
+    }
+  }
+
+  function onMouseMove(e){
+    mousePos(e);
+
+    //clipboard
+    if(check_clip_area()){
+      if(e.shiftKey){
+        if(cur_info['c_down'] && !cur_info['c_rect'] && !cur_info['down'] && !cur_info['rect']){
+          drag_clip_cur();
+
+        }else if(cur_info['c_rect'] && cur_info['c_down']){
+          view_clip_cur();
+
+        }else if(cur_info['rect'] && cur_info['down']){
+          //editor -> clipboard
+          del_cur();
+
+          cur_info['c_rect'] = true;
+          cur_info['c_down'] = true;
+          cur_info['rect'] = false;
+
+          cur_info['c_view_x'] = cur_info['cx'];
+          cur_info['c_view_y'] = cur_info['cy'];
+          cur_info['c_view_w'] = parseInt(cur_info['view_w'] / 8);
+          cur_info['c_view_h'] = parseInt(cur_info['view_h'] / 8);
+
+          if((cur_info['view_w'] % 8) > 0){ cur_info['c_view_w']++; }
+          if((cur_info['view_h'] % 8) > 0){ cur_info['c_view_h']++; }
         }
       }
     }else{
-      del_edit_mes();
+      if(!e.shiftKey){
+        del_edit_mes();
+      }
+    }
+
+    //editor
+    if(check_edit_area()){
+      view_edit_info();
+
+      if(e.shiftKey){
+        if(cur_info['down'] && !cur_info['rect'] && !cur_info['c_down'] && !cur_info['c_rect']){
+          drag_cur();
+
+        }else if(cur_info['rect'] && cur_info['down']){
+          view_cur();
+
+        }else if(cur_info['c_rect'] && cur_info['c_down']){
+          //clipboard -> editor
+          del_clip_cur();
+
+          cur_info['rect'] = true;
+          cur_info['down'] = true;
+          cur_info['c_rect'] = false;
+
+          cur_info['view_x'] = cur_info['dx'];
+          cur_info['view_y'] = cur_info['dy'];
+          cur_info['view_w'] = cur_info['c_view_w'] * 8;
+          cur_info['view_h'] = cur_info['c_view_h'] * 8;
+        }
+      }
+    }else{
+      if(!e.shiftKey){
+        del_edit_mes();
+      }
     }
   }
   cursor.addEventListener('mousedown', onMouseDown, false);
+  cursor.addEventListener('mouseup', onMouseUp, false);
   cursor.addEventListener('mousemove', onMouseMove, false);
 
   function mousePos(e){

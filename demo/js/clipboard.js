@@ -13,6 +13,7 @@ function start_clip_cur(){
   var h = 1;
 
   cur_info['c_down'] = true;
+  cur_info['c_rect'] = false;
 
   if(cur_info['c_clip_w'] > 0 && cur_info['c_clip_h'] > 0){
     w = cur_info['c_clip_w'];
@@ -29,10 +30,32 @@ function end_clip_cur(){
   var w = cur_info['c_view_w'] * CLIP_BLOCK_SIZE;
   var h = cur_info['c_view_h'] * CLIP_BLOCK_SIZE;
 
-  cur_info['c_down'] = false;
   cur_info['c_rect'] = true;
-  set_cursor_fillrect(x,y,w,h,EDITOR_CUR,0.5);
-  del_edit_mes();
+  set_editor_fillrect(x,y,w,h,EDITOR_CUR,0.5);
+  set_edit_mes('drag_paste');
+}
+
+function view_clip_cur(){
+  del_clip_cur();
+
+  if(cur_info['cx'] >= cur_info['c_view_x'] + cur_info['c_view_w'] - 1){
+    cur_info['c_view_x'] = cur_info['cx'] - (cur_info['c_view_w'] - 1);
+  }else{
+    cur_info['c_view_x'] = cur_info['cx'];
+  }
+  if(cur_info['cy'] >= cur_info['c_view_y'] + cur_info['c_view_h'] - 1){
+    cur_info['c_view_y'] = cur_info['cy'] - (cur_info['c_view_h'] - 1);
+  }else{
+    cur_info['c_view_y'] = cur_info['cy'];
+  }
+
+  var x = cur_info['c_view_x'] * CLIP_BLOCK_SIZE + CLIP_X;
+  var y = cur_info['c_view_y'] * CLIP_BLOCK_SIZE + CLIP_Y;
+  var w = cur_info['c_view_w'] * CLIP_BLOCK_SIZE;
+  var h = cur_info['c_view_h'] * CLIP_BLOCK_SIZE;
+
+  set_cursor_rect(x,y,w,h,EDITOR_DRAG,1.0);
+  set_cursor_fillrect(x,y,w,h,EDITOR_DRAG,0.5);
 }
 
 function drag_clip_cur(){
