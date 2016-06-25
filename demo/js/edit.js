@@ -6,6 +6,37 @@ Copyright (c) 2016 emutyworks
 Released under the MIT license
 https://github.com/emutyworks/BitmapEditor/blob/master/LICENSE.txt
 */
+function edit_invert(){
+  var mes = 'invert';
+  var flag = edit_confirm(mes);
+
+  if(flag){    
+    var view_x = cur_info['view_x'];
+    var view_y = cur_info['view_y'];
+    var view_w = cur_info['view_w'];
+    var view_h = cur_info['view_h'];
+
+    set_edit_clip();
+
+    for(var y = 0; y < view_h; y++){
+      for(var x = 0; x < view_w; x++){
+        var dx = x + view_x;
+        var dy = y + view_y;
+        try{
+          var bw = edit_clip[y][x];
+          if(bw == 1){
+            bw = 0;
+          }else{
+            bw = 1;
+          }
+          set_bw(dx, dy, bw);
+        }catch(e){}
+      }
+    }
+  }
+  edit_exit();
+}
+
 function edit_counter_clockwize(){
   var mes = 'counter clockwize';
   var flag = edit_confirm(mes);
@@ -147,6 +178,14 @@ function edit_paste(){
   edit_exit();
 }
 
+function set_merge_paste(){
+  if($('#merge_paste').prop('checked')){
+    merge_paste = true;
+  }else{
+    merge_paste = false;
+  }
+}
+
 function edit_copy(){
   if(!check_select_area()){
     set_edit_mes('no_rect_copy');
@@ -186,6 +225,7 @@ function edit_cancel(){
 function edit_exit(){
   del_cur();
   cur_info['rect'] = false;
+  cur_info['c_rect'] = false;
   redraw_editor();
 }
 

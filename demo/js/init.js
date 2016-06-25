@@ -11,6 +11,16 @@ var MAX_PIXEL_Y =32;
 var PIXEL_SIZE = 14;
 var PRE_PIXEL_SIZE = 2;
 
+var CLIP_PIXEL_SIZE = 4;
+var CLIP_BLOCK_SIZE = CLIP_PIXEL_SIZE * 8 + 1;
+var CLIP_MAX_X = 8;
+var CLIP_MAX_Y = 16;
+var CLIP_X = null;
+var CLIP_Y = null;
+
+var CUR_MIN_W = 4;
+var CUR_MIN_H = 4;
+
 var EDITOR_LINE = "#808080";
 var EDITOR_GUIDE = "#e0e080";
 var EDITOR_CUR = "#ff0000";
@@ -22,17 +32,7 @@ var EDITOR_MAIN_Y = EDITOR_MENU_Y + EDITOR_MENU_SIZE;
 var EDITOR_PRE_X = 0;
 var EDITOR_PRE_Y = 0;
 var EDITOR_MAX_X = (8 * 128) + 1 + 270;
-var EDITOR_MAX_Y = (PRE_PIXEL_SIZE * 64) + EDITOR_MENU_SIZE + (8 * 64);
-
-var CLIP_PIXEL_SIZE = 4;
-var CLIP_BLOCK_SIZE = CLIP_PIXEL_SIZE * 8 + 1;
-var CLIP_MAX_X = 8;
-var CLIP_MAX_Y = 16;
-var CLIP_X = null;
-var CLIP_Y = null;
-
-var CUR_MIN_W = 4;
-var CUR_MIN_H = 4;
+var EDITOR_MAX_Y = PRE_PIXEL_SIZE * MAX_PIXEL_Y + EDITOR_MENU_SIZE + (CLIP_MAX_Y * CLIP_BLOCK_SIZE + 10);
 
 var d = new Array();
 var p = new Array();
@@ -48,6 +48,8 @@ var c_ctx = null;
 var cur_info = new Array();
 var edit_alert = false;
 var edit_mes = new Array();
+var merge_paste = false;
+var view_hx = false;
 
 init_edit_data();
 init_clip_data();
@@ -172,6 +174,7 @@ function init_editor(){
     top: EDITOR_MAIN_Y - 38,
   });
 
+  $('#hx').css('top', EDITOR_MAX_Y);
 }
 
 function init_editor_guide(){
@@ -273,12 +276,38 @@ function init_edit_data(){
     0,//"10000000b"
   ];
 
+  var CtrlKeyText = 'CTRL';
+  if(is_mac()){ CtrlKeyText = 'Command'; }
+
   edit_mes = {
     start_cur: 'SHIFT key press + Mouse move -> SHIFT key up',
     no_rect: 'Please select a area (SHIFT key press + Mouse move)',
-    no_rect_cut: 'Please select a area (SHIFT key press + Mouse move) -> Click CTRL + X',
-    no_rect_copy: 'Please select a area (SHIFT key press + Mouse move) -> Click CTRL + C',
-    no_rect_paste: 'Please select a area (SHIFT key press + Mouse move) -> Click CTRL + V',
+    no_rect_cut: 'Please select a area (SHIFT key press + Mouse move) -> Click ' + CtrlKeyText + ' + X',
+    no_rect_copy: 'Please select a area (SHIFT key press + Mouse move) -> Click ' + CtrlKeyText + ' + C',
+    no_rect_paste: 'Please select a area (SHIFT key press + Mouse move) -> Click ' + CtrlKeyText + ' + V',
   };
 
+}
+
+function is_mac(){
+  if(navigator.userAgent.indexOf('Mac') != -1){
+    return true;
+  }else{
+    return false;
+  }
+}
+
+function cnv16to2(hx){
+  return ('00000000' + parseInt(hx,16).toString(2)).slice(-8);
+}
+function cnv2to16(b){
+  return '0x' + ('00' + parseInt(b,2).toString(16)).slice(-2);
+}
+
+function set_edit_mes(key){
+  $('#edit_mes').html(edit_mes[key]);
+}
+
+function del_edit_mes(){
+  $('#edit_mes').html('');
 }

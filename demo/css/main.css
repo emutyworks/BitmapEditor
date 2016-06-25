@@ -46,10 +46,9 @@ body, input {
 	left: 0px;
 	top: 0px;
   }
-/*
 #hx {
+	visibility: visible;
 	position: absolute;
 	z-index: 1;
 	left: 0px;
   }
- */

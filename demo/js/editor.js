@@ -44,26 +44,31 @@ function change_edit_pixel(x,y){
     MAX_PIXEL_X = x;
     MAX_PIXEL_Y = y;
 
-    EDITOR_MAX_Y = (PRE_PIXEL_SIZE * 64) + EDITOR_MENU_SIZE + (64 * 8 * 10) + 1;
-
-    if(MAX_PIXEL_X==128){
+    if(MAX_PIXEL_X == 128){
       PIXEL_SIZE = 8;
-    }else if(MAX_PIXEL_Y==8){
+    }else if(MAX_PIXEL_Y == 8){
       PIXEL_SIZE = 16;
-    }else if(MAX_PIXEL_Y==16){
+    }else if(MAX_PIXEL_Y == 16){
       PIXEL_SIZE = 16;
-    }else if(MAX_PIXEL_Y==32){
+    }else if(MAX_PIXEL_Y == 32){
       PIXEL_SIZE = 14;
-    }else if(MAX_PIXEL_Y==64){
+    }else if(MAX_PIXEL_Y == 64){
       PIXEL_SIZE = 10;
     }
     EDITOR_MENU_Y = PRE_PIXEL_SIZE * MAX_PIXEL_Y;
     EDITOR_MAIN_Y = EDITOR_MENU_Y + EDITOR_MENU_SIZE;
 
+    if(MAX_PIXEL_Y == 64 || MAX_PIXEL_X == 128){
+      EDITOR_MAX_Y = PRE_PIXEL_SIZE * MAX_PIXEL_Y + EDITOR_MENU_SIZE + (MAX_PIXEL_Y * PIXEL_SIZE + 10);
+    }else{
+      EDITOR_MAX_Y = PRE_PIXEL_SIZE * MAX_PIXEL_Y + EDITOR_MENU_SIZE + (CLIP_MAX_Y * CLIP_BLOCK_SIZE + 10);
+    }
+
     init_edit_data();
     init_editor();
 
     redraw_clip();
+    console.log(EDITOR_MAX_Y);
   }
 }
 
@@ -100,13 +105,32 @@ function set_bw(dx,dy,bw){
   }
   ctx.fillRect(dx * PIXEL_SIZE + 1, (dy * PIXEL_SIZE + 1) + EDITOR_MAIN_Y, PIXEL_SIZE - 1, PIXEL_SIZE - 1);
   ctx.fillRect((dx * PRE_PIXEL_SIZE) + EDITOR_PRE_X + 1, (dy * PRE_PIXEL_SIZE) + EDITOR_PRE_Y + 1, PRE_PIXEL_SIZE, PRE_PIXEL_SIZE);
- }
+
+  if(view_hx){
+    $('#hx').val(get_hx_str());
+  }
+}
+
+function set_view_hx(){
+  if($('#view_hx').prop('checked')){
+    view_hx = true;
+    $('#hx').css('visibility', 'visible');
+  }else{
+    view_hx = false;
+    $('#hx').css('visibility', 'hidden');
+  }
+}
 
 function get_hx_str(){
   var hx_str = '';
+
   if(MAX_PIXEL_X == 8 || MAX_PIXEL_X == 16){
-    hx_str = d.join(', ');
-    hx_str += "\n";
+    for(var i = 0; i < (MAX_PIXEL_X * MAX_PIXEL_Y / 8 / 8); i++){
+      var dx = i * 8;
+      hx_str += 
+        d[dx]+', '+d[dx+1]+', '+d[dx+2]+', '+d[dx+3]+', '+
+        d[dx+4]+', '+d[dx+5]+', '+d[dx+6]+', '+d[dx+7]+",\n";
+    }
   }else{
     for(var i = 0; i < (MAX_PIXEL_X * MAX_PIXEL_Y / 8 / 16); i++){
       var dx = i * 16;

@@ -20,13 +20,17 @@ function paste_edit_clip(){
           var dy = y + view_y;
           try{
             var bw = edit_clip[y][x];
-            set_bw(dx, dy, bw);
+            if(merge_paste){
+              if(bw == 1){
+                set_bw(dx, dy, bw);
+              }
+            }else{
+              set_bw(dx, dy, bw);
+            }
           }catch(e){}
         }
       }
     }
-    del_cur();
-    cur_info['rect'] = false;
 
   }else if(check_select_area() == 'clip'){
     var c_clip_x = cur_info['c_view_x'];
@@ -39,14 +43,17 @@ function paste_edit_clip(){
         for(var x = 0; x < c_clip_w * 8; x++){
           try{
             var bw = edit_clip[y][x];
-            set_clip_bw(x + (c_clip_x * 8), y + (c_clip_y * 8), bw);
-          }catch(e){}
+            if(merge_paste){
+              if(bw == 1){
+                set_clip_bw(x + (c_clip_x * 8), y + (c_clip_y * 8), bw);
+              }
+            }else{
+                set_clip_bw(x + (c_clip_x * 8), y + (c_clip_y * 8), bw);
+            }
+         }catch(e){}
         }
       }
     }
-    set_clip_data();
-    del_clip_cur();
-    cur_info['c_rect'] = false;
   }
 }
 
@@ -93,8 +100,6 @@ function set_edit_clip(){
       }
       edit_clip[y] = row;
     }
-    del_cur();
-    cur_info['rect'] = false;
 
   }else if(check_select_area() == 'clip'){
     var c_clip_x = cur_info['c_view_x'];
@@ -118,8 +123,6 @@ function set_edit_clip(){
       }
       edit_clip[y] = row;
     }
-    del_clip_cur();
-    cur_info['c_rect'] = false;
   }
 }
 
