@@ -16,11 +16,18 @@ window.onload = function(){
   init_editor();
   init_clip();
 
+  merge_paste = false;
+  edit_alert = true;
+  view_hx = false;
+
+  $('#merge_paste').prop("checked", merge_paste);
+  $('#edit_alert').prop("checked", edit_alert);
+  $('#view_hx').prop("checked", view_hx);
+
   $('#memo').attr({ value: 'New Character' });
   $('#min_w').attr({ value: cur_info['min_w'] });
   $('#min_h').attr({ value: cur_info['min_h'] });
-
-  $('#merge_paste').prop("checked",false);
+  $('#edit_undo').css({ display: 'none'});
 
 /*
   $(window).on('beforeunload', function() {
@@ -35,24 +42,18 @@ window.onload = function(){
           return false;
       }
       if(e.ctrlKey || (e.metaKey && is_mac()) ){
-        if(e.keyCode === 67){
-          edit_copy();
-          return false;
-        }
-        if(e.keyCode === 86){
-          edit_paste();
-          return false;
-        }
-        if(e.keyCode === 88){
-          edit_cut();
+        if(e.keyCode === 90 && undo_flag){
+          edit_undo();
           return false;
         }
       }
     });
+
     $(window).keyup(function(e){
-      if(!e.shiftKey){
+      if(!e.shiftKey && paste_flag){
         cur_info['down'] = false;
         cur_info['c_down'] = false;
+        paste_flag = false;
 
         //clipboard
         if(check_clip_area()){

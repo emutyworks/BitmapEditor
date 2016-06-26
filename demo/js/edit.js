@@ -156,7 +156,7 @@ function edit_paste(){
   }
 
   var flag = true;
-  if(edit_alert){
+  if(!edit_alert){
     flag = edit_confirm_alert(mes);
   }
 
@@ -174,56 +174,29 @@ function set_merge_paste(){
   }
 }
 
-function edit_copy(){
-  if(!check_select_area()){
-    set_edit_mes('no_rect_copy');
-    return;
-  }
-  edit_exit();
-}
-
-function edit_cut(){
-  var mes = 'cut';
-
-  if(!check_select_area()){
-    set_edit_mes('no_rect_paste');
-    return;
-  }
+function edit_undo(){
+  var mes = 'undo';
 
   var flag = true;
-  if(edit_alert){
+  if(!edit_alert){
     flag = edit_confirm_alert(mes);
   }
 
-  if(flag){
-    if(check_select_area() == 'edit'){
-      var view_x = cur_info['view_x'];
-      var view_y = cur_info['view_y'];
-      var view_w = cur_info['view_w'];
-      var view_h = cur_info['view_h'];
-
-      for(var y = 0; y < view_h; y++){
-        for(var x = 0; x < view_w; x++){
-          var dx = x + view_x;
-          var dy = y + view_y;
-          set_bw(dx, dy, 0);
-        }
-      }
-    }else if(check_select_area() == 'clip'){
-      var c_clip_x = cur_info['c_view_x'];
-      var c_clip_y = cur_info['c_view_y'];
-      var c_clip_w = cur_info['c_view_w'];
-      var c_clip_h = cur_info['c_view_h'];
-
-      for(var y = 0; y < c_clip_h; y++){
-        for(var x = 0; x < (c_clip_w * 8); x++){
-          var p = (x + c_clip_x * 8) + ((y + c_clip_y) * CLIP_MAX_X * 8);
-          clipboard[p] = '0x00';
-        }
-      }
-    }
+  if(flag && undo_flag){
+    d = undo_d.concat();
+    clipboard = undo_clipboard.concat();
+    undo_flag = false;
+    $('#edit_undo').css({ display: 'none'});
+ 
+    edit_exit();
   }
-  edit_exit();
+}
+
+function copy_data(){
+  undo_d = d.concat();
+  undo_clipboard = clipboard.concat();
+  undo_flag = true;
+  $('#edit_undo').css({ display: 'inline'});
 }
 
 function edit_cancel(){
@@ -244,7 +217,7 @@ function edit_confirm(mes){
   }
 
   var flag = true;
-  if(edit_alert){
+  if(!edit_alert){
     flag = edit_confirm_alert(mes);
   }
   return flag;
@@ -256,8 +229,8 @@ function edit_confirm_alert(mes){
 
 function set_edit_alert(){
   if($('#edit_alert').prop('checked')){
-    edit_alert = false;
-  }else{
     edit_alert = true;
+  }else{
+    edit_alert = false;
   }
 }

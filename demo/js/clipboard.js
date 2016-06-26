@@ -31,7 +31,7 @@ function end_clip_cur(){
   var h = cur_info['c_view_h'] * CLIP_BLOCK_SIZE;
 
   cur_info['c_rect'] = true;
-  set_editor_fillrect(x,y,w,h,EDITOR_CUR,0.5);
+  set_editor_fillrect(x, y, w + 1, h + 1, EDITOR_CUR, 0.5);
   set_edit_mes('drag_paste');
 }
 

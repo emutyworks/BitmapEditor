@@ -36,9 +36,10 @@ var EDITOR_MAX_X = (8 * 128) + 1 + 270;
 var EDITOR_MAX_Y = PRE_PIXEL_SIZE * MAX_PIXEL_Y + EDITOR_MENU_SIZE + (CLIP_MAX_Y * CLIP_BLOCK_SIZE + 10);
 
 var d = new Array();
-var p = new Array();
 var edit_clip = null;
 var clipboard = null;
+var undo_d = new Array();
+var undo_clipboard = new Array();
 var set_w = null;
 var set_b = null;
 var get_dy = null;
@@ -47,10 +48,12 @@ var ctx = null;
 var cursor = null;
 var c_ctx = null;
 var cur_info = new Array();
-var edit_alert = false;
 var edit_mes = new Array();
-var merge_paste = false;
-var view_hx = false;
+var edit_alert = null;
+var merge_paste = null;
+var view_hx = null;
+var undo_flag = false;
+var paste_flag = false;
 
 init_edit_data();
 init_clip_data();
@@ -294,16 +297,16 @@ function init_edit_data(){
     0,//"10000000b"
   ];
 
-  var CtrlKeyText = 'CTRL';
-  if(is_mac()){ CtrlKeyText = 'Command'; }
+  //var CtrlKeyText = 'CTRL';
+  //if(is_mac()){ CtrlKeyText = 'Command'; }
 
   edit_mes = {
-    start_cur: 'SHIFT key press + Mouse drag -> Mouse up (SHIFT key press)',
-    no_rect: 'Please select a area (SHIFT key press + Mouse move)',
-    no_rect_cut: 'Please select a area (SHIFT key press + Mouse move) -> Click ' + CtrlKeyText + ' + X',
-    no_rect_copy: 'Please select a area (SHIFT key press + Mouse move) -> Click ' + CtrlKeyText + ' + C',
-    no_rect_paste: 'Please select a area (SHIFT key press + Mouse move) -> Click ' + CtrlKeyText + ' + V',
+    no_rect: 'Please select a area (SHIFT key press + Mouse drag)',
+    start_cur: 'SHIFT key press + Mouse click and drag -> Mouse up (SHIFT key press) -> Copy',
     drag_paste: 'Mouse drag (SHIFT key press) -> SHIFT key up -> Paste',
+    edit_copy: 'SHIFT key press + Mouse click and drag (Red selection) -> Mouse up',
+    edit_paste: 'SHIFT key press + Mouse drag (Yellow selection) -> Mouse up',
+    edit_undo: 'Return one history editing',
   };
 
 }

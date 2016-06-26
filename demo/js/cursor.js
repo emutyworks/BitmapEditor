@@ -72,6 +72,9 @@ function set_clip_bw(x,y,bw){
 }
 
 function set_edit_clip(){
+  copy_data();
+  paste_flag = true;
+  
   if(check_select_area() == 'edit'){
     var clip_x = cur_info['view_x'];
     var clip_y = cur_info['view_y'];
@@ -133,7 +136,6 @@ function start_cur(){
 
   if(cur_info['rect']){
     init_editor();
-    reset_data();
   }
 
   cur_info['down'] = true;
@@ -154,7 +156,7 @@ function end_cur(){
   var w = cur_info['view_w'] * PIXEL_SIZE;
   var h = cur_info['view_h'] * PIXEL_SIZE;
 
-  set_editor_fillrect(x,y,w,h,EDITOR_CUR,0.5);
+  set_editor_fillrect(x, y, w + 1, h + 1, EDITOR_CUR, 0.5);
 
   cur_info['rect'] = true;
   set_edit_mes('drag_paste');
@@ -185,12 +187,12 @@ function view_cur(){
   del_cur_all();
   view_cur_bw();
 
-  if(cur_info['dx'] > cur_info['view_x']){
+  if(cur_info['dx'] > cur_info['view_x'] + 5){
     cur_info['view_x'] = cur_info['dx'] - cur_info['view_w'];
   }else{
     cur_info['view_x'] = cur_info['dx'];
   }
-  if(cur_info['dy'] > cur_info['view_y']){
+  if(cur_info['dy'] > cur_info['view_y'] + 5){
     cur_info['view_y'] = cur_info['dy'] - cur_info['view_h'];
   }else{
     cur_info['view_y'] = cur_info['dy'];
