@@ -76,10 +76,16 @@ function change_bw(){
     var dy = cur_info['dy'];
     var bw = get_d(dx,dy);
     
-    if(bw == 1){
-      set_bw(dx,dy,0);
+    if(change_bw_flag){
+      set_bw(dx,dy,change_bw_old);
     }else{
-      set_bw(dx,dy,1);
+      if(bw == 1){
+        set_bw(dx,dy,0);
+        change_bw_old = 0;
+      }else{
+        set_bw(dx,dy,1);
+        change_bw_old = 1;
+      }
     }
   }
 }

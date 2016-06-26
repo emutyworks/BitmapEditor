@@ -55,6 +55,7 @@ var view_hx = null;
 var undo_flag = false;
 var paste_flag = false;
 var change_bw_flag = false;
+var change_bw_old = null;
 
 init_edit_data();
 init_clip_data();
