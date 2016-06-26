@@ -91,6 +91,7 @@ window.onload = function(){
         start_cur();
       }else{
         change_bw();
+        change_bw_flag = true;
       }
     }else{
     }
@@ -98,6 +99,7 @@ window.onload = function(){
 
   function onMouseUp(e){
     mousePos(e);
+    change_bw_flag = false;
 
     //clipboard
     if(check_clip_area()){
@@ -159,6 +161,11 @@ window.onload = function(){
     if(check_edit_area()){
       view_edit_info();
 
+      if(change_bw_flag 
+        && (cur_info['dx'] != cur_info['old_dx'] || cur_info['dy'] != cur_info['old_dy'])){
+        change_bw(); 
+      }
+
       if(e.shiftKey){
         if(cur_info['down'] && !cur_info['rect'] && !cur_info['c_down'] && !cur_info['c_rect']){
           drag_cur();
@@ -209,6 +216,8 @@ window.onload = function(){
     cur_info['org_y'] = org_y;
     cur_info['x'] = x;
     cur_info['y'] = y;
+    cur_info['old_dx'] = cur_info['dx'];
+    cur_info['old_dy'] = cur_info['dy'];
     cur_info['dx'] = dx;
     cur_info['dy'] = dy;
     cur_info['cx'] = cx;

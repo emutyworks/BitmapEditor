@@ -54,6 +54,7 @@ var merge_paste = null;
 var view_hx = null;
 var undo_flag = false;
 var paste_flag = false;
+var change_bw_flag = false;
 
 init_edit_data();
 init_clip_data();
@@ -237,6 +238,8 @@ function init_edit_data(){
     //editor
     dx: 0,
     dy: 0,
+    old_dx: 0,
+    old_dy: 0,
     view_x: 0,
     view_y: 0,
     view_w: 0,
