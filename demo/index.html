@@ -29,11 +29,22 @@ https://github.com/emutyworks/BitmapEditor/blob/master/LICENSE.txt
 <a href="javascript:change_edit_pixel(16,16);">16x16</a> | 
 <a href="javascript:change_edit_pixel(32,32);">32x32</a> | 
 <a href="javascript:change_edit_pixel(64,64);">64x64</a> | 
-<a href="javascript:change_edit_pixel(128,64);">128x64</a> 
-<input type="checkbox" name="view_hx" id="view_hx" onclick="set_view_hx()" value="">View Hex Data &nbsp;
+<a href="javascript:change_edit_pixel(128,64);">128x64</a> | 
+<input type="text" name="pixel_x" id="pixel_x">x<select name="pixel_y" id="pixel_y">
+<option value="8">8</option>
+<option value="16">16</option>
+<option value="24">24</option>
+<option value="32">32</option>
+<option value="40">40</option>
+<option value="48">48</option>
+<option value="56">56</option>
+<option value="64">64</option>
+</select>
+<a href="javascript:apply_edit_pixel();">Apply</a>&nbsp;&nbsp;
 <a id="download" href="" download="" onclick="data_download()"　target="_blank">Download</a> | 
-Upload <input type="file" id="data_upload" accept="text/*"><br>
-<b>Memo:</b> <input type="text" name="memo" id="memo"><br>
+Upload <input type="file" id="data_upload" accept="*/*"><br>
+<b>Memo:</b> <input type="text" name="memo" id="memo">
+<input type="checkbox" name="view_hx" id="view_hx" onclick="set_view_hx()" value="">View Hex Data<br>
 
 <div id="edit_view">
 <span id="edit_menu">
@@ -54,7 +65,7 @@ Upload <input type="file" id="data_upload" accept="text/*"><br>
 <a href="#" onmouseover="set_edit_mes('edit_paste');  return false;">Paste</a><input type="checkbox" name="merge_paste" id="merge_paste" onclick="set_merge_paste()" value="">Merge | 
 <a href="javascript:edit_cancel();">Cancel(esc)</a> | 
 <span id="edit_undo"><a href="javascript:edit_undo();" onmouseover="set_edit_mes('edit_undo');">Undo(z)</a> | </span>
-<input type="checkbox" name="edit_alert" id="edit_alert" onclick="set_edit_alert()" value="">No confirmation
+<input type="checkbox" name="edit_alert" id="edit_alert" onclick="set_edit_alert()" value="">None alert
 </span>
 
 <textarea id="hx" rows="30" cols="110"></textarea><br>

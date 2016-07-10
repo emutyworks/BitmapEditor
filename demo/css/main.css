@@ -6,13 +6,12 @@ Copyright (c) 2016 emutyworks
 Released under the MIT license
 https://github.com/emutyworks/BitmapEditor/blob/master/LICENSE.txt
 */
-body, input {
+body, input, select {
   font-family: helvetica, arial, sans-serif;
   font-size: 9pt;
   padding: 0px 0px 0px 0px;
   cursor: default;
   }
-
 .mono {
 	font-family: monospace;
 	font-size: 10pt;
@@ -53,3 +52,8 @@ body, input {
 	z-index: 1;
 	left: 0px;
   }
+#pixel_x {
+  width: 30px;
+  }
+
+
