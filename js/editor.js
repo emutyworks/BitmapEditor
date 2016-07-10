@@ -38,26 +38,36 @@ function view_edit_info(){
   );
 }
 
+function apply_edit_pixel(){
+  var x = $('#pixel_x').val();
+  var y = $('#pixel_y').val();
+
+  if( x == 0 ){ x = 1; }
+  if( x > 128 ){ x = 128; }
+
+  change_edit_pixel(x,y);
+}
+
 function change_edit_pixel(x,y){
   if(window.confirm('Data will be reset. Is it OK?')){
     MAX_PIXEL_X = x;
     MAX_PIXEL_Y = y;
 
-    if(MAX_PIXEL_X == 128){
-      PIXEL_SIZE = 8;
-    }else if(MAX_PIXEL_Y == 8){
+    if(MAX_PIXEL_X <= 8 &&  MAX_PIXEL_Y == 8 ){
       PIXEL_SIZE = 16;
-    }else if(MAX_PIXEL_Y == 16){
+    }else if(MAX_PIXEL_X <= 16 && MAX_PIXEL_Y == 16){
       PIXEL_SIZE = 16;
-    }else if(MAX_PIXEL_Y == 32){
+    }else if(MAX_PIXEL_X <= 32 && MAX_PIXEL_Y <= 32){
       PIXEL_SIZE = 14;
-    }else if(MAX_PIXEL_Y == 64){
+    }else if(MAX_PIXEL_X <= 64 && MAX_PIXEL_Y <= 64){
       PIXEL_SIZE = 10;
+    }else{
+      PIXEL_SIZE = 8;
     }
     EDITOR_MENU_Y = PRE_PIXEL_SIZE * MAX_PIXEL_Y;
     EDITOR_MAIN_Y = EDITOR_MENU_Y + EDITOR_MENU_SIZE;
 
-    if(MAX_PIXEL_Y == 64 || MAX_PIXEL_X == 128){
+    if(MAX_PIXEL_Y > 48){
       EDITOR_MAX_Y = PRE_PIXEL_SIZE * MAX_PIXEL_Y + EDITOR_MENU_SIZE + (MAX_PIXEL_Y * PIXEL_SIZE + 10);
     }else{
       EDITOR_MAX_Y = PRE_PIXEL_SIZE * MAX_PIXEL_Y + EDITOR_MENU_SIZE + (CLIP_MAX_Y * CLIP_BLOCK_SIZE + 10);
@@ -67,6 +77,18 @@ function change_edit_pixel(x,y){
     init_editor();
 
     redraw_clip();
+
+    if(MAX_PIXEL_X < cur_info['min_w']){
+      cur_info['min_w'] = x;
+      $('#min_w').val( cur_info['min_w'] );
+    }
+
+    $('#pixel_x').val( MAX_PIXEL_X );
+    $('#pixel_y').val( MAX_PIXEL_Y );
+
+    if(view_hx){
+      $('#hx').val(get_hx_str());
+    }
   }
 }
 
@@ -133,24 +155,17 @@ function set_view_hx(){
 
 function get_hx_str(){
   var hx_str = '';
+  var i = 0;
 
-  if(MAX_PIXEL_X == 8 || MAX_PIXEL_X == 16){
-    for(var i = 0; i < (MAX_PIXEL_X * MAX_PIXEL_Y / 8 / 8); i++){
-      var dx = i * 8;
-      hx_str += 
-        d[dx]+', '+d[dx+1]+', '+d[dx+2]+', '+d[dx+3]+', '+
-        d[dx+4]+', '+d[dx+5]+', '+d[dx+6]+', '+d[dx+7]+",\n";
-    }
-  }else{
-    for(var i = 0; i < (MAX_PIXEL_X * MAX_PIXEL_Y / 8 / 16); i++){
-      var dx = i * 16;
-      hx_str += 
-        d[dx]+', '+d[dx+1]+', '+d[dx+2]+', '+d[dx+3]+', '+
-        d[dx+4]+', '+d[dx+5]+', '+d[dx+6]+', '+d[dx+7]+', '+
-        d[dx+8]+', '+d[dx+9]+', '+d[dx+10]+', '+d[dx+11]+', '+
-        d[dx+12]+', '+d[dx+13]+', '+d[dx+14]+', '+d[dx+15]+",\n";
+  for(i = 0; i < (MAX_PIXEL_X * MAX_PIXEL_Y / 8); i++){
+    if((i + 1) % 16){
+      hx_str += d[i]+", ";
+    }else{
+      hx_str += d[i]+",\n";
     }
   }
+
+  hx_str += "\n";
   return hx_str;
 }
 

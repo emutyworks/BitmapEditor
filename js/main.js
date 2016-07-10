@@ -18,16 +18,19 @@ window.onload = function(){
 
   merge_paste = false;
   edit_alert = true;
-  view_hx = false;
+  view_hx = true;
 
   $('#merge_paste').prop("checked", merge_paste);
   $('#edit_alert').prop("checked", edit_alert);
   $('#view_hx').prop("checked", view_hx);
 
-  $('#memo').attr({ value: 'New Character' });
-  $('#min_w').attr({ value: cur_info['min_w'] });
-  $('#min_h').attr({ value: cur_info['min_h'] });
+  $('#memo').val( 'New Character' );
+  $('#min_w').val( cur_info['min_w'] );
+  $('#min_h').val( cur_info['min_h'] );
   $('#edit_undo').css({ display: 'none'});
+
+  $('#pixel_x').val( MAX_PIXEL_X );
+  $('#pixel_y').val( MAX_PIXEL_Y );
 
 /*
   $(window).on('beforeunload', function() {
@@ -223,8 +226,8 @@ window.onload = function(){
     cur_info['cx'] = cx;
     cur_info['cy'] = cy;
 
-    if($('#min_w').val() == 0){ $('#min_w').attr({ value: 1 }); }
-    if($('#min_h').val() == 0){ $('#min_h').attr({ value: 1 }); }
+    if($('#min_w').val() == 0){ $('#min_w').val( 1 ); }
+    if($('#min_h').val() == 0){ $('#min_h').val( 1 ); }
     cur_info['min_w'] = parseInt($('#min_w').val(),10);
     cur_info['min_h'] = parseInt($('#min_h').val(),10);
   }
@@ -271,7 +274,7 @@ window.onload = function(){
       var pixel = up_d['Pixel'].split('x');
       change_edit_pixel(pixel[0],pixel[1]);
       
-      $('#memo').attr('value', up_d['Memo']);
+      $('#memo').val( up_d['Memo'] );
     
       d = editor_data.split(',');
       clipboard = clipboard_data.split(',');
