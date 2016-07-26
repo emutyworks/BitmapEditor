@@ -60,9 +60,9 @@ window.onload = function(){
 
         //clipboard
         if(check_clip_area()){
-          if(cur_info['c_clip_x'] != cur_info['c_view_x'] || cur_info['c_clip_y'] != cur_info['c_view_y']){
+//          if(cur_info['c_clip_x'] != cur_info['c_view_x'] || cur_info['c_clip_y'] != cur_info['c_view_y']){
             edit_paste();  
-          }
+//          }
         }
 
         //editor
