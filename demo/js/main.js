@@ -60,14 +60,13 @@ window.onload = function(){
 
         //clipboard
         if(check_clip_area()){
-//          if(cur_info['c_clip_x'] != cur_info['c_view_x'] || cur_info['c_clip_y'] != cur_info['c_view_y']){
-            edit_paste();  
-//          }
+          edit_paste();  
         }
 
         //editor
         if(check_edit_area()){
-          if(cur_info['clip_x'] != cur_info['view_x'] || cur_info['clip_y'] != cur_info['view_y']){
+          if(cur_info['clip_x'] != cur_info['view_x'] || cur_info['clip_y'] != cur_info['view_y'] 
+          || (cur_info['clip_x'] == 0 && cur_info['clip_y'] == 0)){
             edit_paste();  
           }
         }
@@ -241,7 +240,7 @@ window.onload = function(){
 
     reader.onload = function(){
       var up_text = reader.result;
-    　 var up_array = up_text.split("\n");
+      var up_array = up_text.split("\n");
 
       var up_d = new Array();
       var editor_data = '';
